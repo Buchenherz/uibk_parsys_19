@@ -1,0 +1,31 @@
+#!/bin/bash
+
+# Select queue. There are three queues available.
+# std.q is the general purpose and default queue with a maximum runtime of 240 hours.
+# short.q is for small tests jobs, has a limited number of CPU slots and a max          	# runtime of 10 hours.
+# bigmem.q is for Leo3e. Max runtime of 240 hours with 512GB memory nodes.
+#$ -q std.q
+
+# The batch system should use the current directory as working directory. Makes it
+# easier to handle files
+#$ -cwd
+
+# Name the job. Unless you use the -o and -e options, output will
+# go to a unique file name.ojob_id for each job.
+#$ -N osu_bw
+
+# Join the error stream to the output stream.
+#$ -j yes
+
+# Specifies the parallel environment. A list is available with qconf -spl. 
+# Each node has 2 Intel Quad-Core L5420 CPUs (8 cores running on 2.5 GHz) according to the manual on
+# https://www.uibk.ac.at/zid/systeme/hpc-systeme/lcc2/hardware/
+# so in theory, if i require 4 cores per system, it should take two sockets on the same node
+#$ -pe openmpi-8perhost 8
+
+# Load module because the software can be run on another system and not in the current
+# ssh session
+module load openmpi/4.0.1
+
+# Execute the software on 2 slots but on the same host
+mpiexec -n 2 ../osu-micro-benchmarks-5.6.2/mpi/pt2pt/osu_bw
