@@ -1,0 +1,8 @@
+
+venv/
+
+.DS_Store
+
+.idea/
+
+proseminar/01/.ipynb_checkpoints/
