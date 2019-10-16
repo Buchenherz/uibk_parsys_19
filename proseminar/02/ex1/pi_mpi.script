@@ -30,4 +30,4 @@
 module load openmpi/4.0.1
 
 # Execute the software on 2 slots
-mpiexec -n 2 $PWD/pi_mpi
+mpiexec -n 2 -map-by ppr:2:socket $PWD/pi_mpi
