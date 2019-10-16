@@ -1,0 +1,7 @@
+  Loading openmpi/4.0.1 for compiler gnu-4.8.5
+Hello world from rank 0 of 2
+Hello world from rank 1 of 2
+Local hits for process 1 - hits 389394440 - gens 500000000
+Local hits for process 0 - hits 389394440 - gens 500000000
+PI = 1.557578
+ (All hits: 389394440 | Genterated Points: 1000000000)
