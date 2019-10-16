@@ -36,6 +36,7 @@ This example is taken and modified from the example discussed in the first prose
 
 # Specifies the parallel environment. A list is available with qconf -spl. In this case
 # 2 slots per node, with 8 slots in total
+# These resources will be reserved at all times, so try to only use what you need.
 #$ -pe openmpi-2perhost 8
 
 # Load module because the software can be run on another system and not in the current 
@@ -51,5 +52,6 @@ mpiexec -n 8 /bin/hostname
 3. `-M email_address` -> `-m [b|e|a|s|n]`. Get a notifications on specific events (e.g. end of job) to the specified email address. 
 4. Queue selection. This is important to not use more resources than needed. Possible options for the UIBK SGE are std.q, short.q and bigmem.q.
 5. `-w v`. Check whether the syntax of the job is okay (do not submit the job). Useful to not send malformed jobs to the cluster.
+6. `-l` flag to specify time and memeory limit. Scheduling will take the time constrain into account. In slurm, you may also specify the minimum runtime.
 ### How do you run your program in parallel? What environment setup is required?
 You need to specify how many cores / nodes you need within the job script file. You also need to load the module for each machine e.g. you need to add `module load openmpi/4.0.1` to any script running in parallel. Program execution then needs to be done using `mpiexec -n no_of_slots program_binary`.

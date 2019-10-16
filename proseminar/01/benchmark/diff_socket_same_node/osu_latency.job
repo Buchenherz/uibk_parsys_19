@@ -21,11 +21,17 @@
 # Each node has 2 Intel Quad-Core L5420 CPUs (8 cores running on 2.5 GHz) according to the manual on
 # https://www.uibk.ac.at/zid/systeme/hpc-systeme/lcc2/hardware/
 # so in theory, if i require 8 cores per system, it should take two sockets on the same node
-#$ -pe openmpi-8perhost 8
+## The mapping may be smaller like 2perhost 2
+#$ -pe openmpi-2perhost 2
+
+#$ -l exclusive=true
 
 # Load module because the software can be run on another system and not in the current
 # ssh session
 module load openmpi/4.0.1
 
 # Execute the software on 2 slots but on the same host
-mpiexec -n 2 ../osu-micro-benchmarks-5.6.2/mpi/pt2pt/osu_latency
+## --map-by flag for mpiexec as well
+## --display-map
+## --bind-to
+mpiexec -n 2 --map-by socket ../osu-micro-benchmarks-5.6.2/mpi/pt2pt/osu_latency

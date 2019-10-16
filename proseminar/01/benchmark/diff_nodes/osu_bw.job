@@ -20,6 +20,7 @@
 # Specifies the parallel environment. A list is available with qconf -spl. 
 # spawn 1 process on 2 hosts.
 #$ -pe openmpi-1perhost 2
+#$ -l exclusive=true
 
 # Load module because the software can be run on another system and not in the current
 # ssh session

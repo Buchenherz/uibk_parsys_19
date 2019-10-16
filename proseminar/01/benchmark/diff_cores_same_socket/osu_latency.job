@@ -17,6 +17,8 @@
 # Join the error stream to the output stream.
 #$ -j yes
 
+#$ -l exclusive=true
+
 # Specifies the parallel environment. A list is available with qconf -spl. 
 # spawn 2 processes on 1 host.
 #$ -pe openmpi-2perhost 2
@@ -26,4 +28,4 @@
 module load openmpi/4.0.1
 
 # Execute the software on 2 slots but on the same host
-mpiexec -n 2 ../osu-micro-benchmarks-5.6.2/mpi/pt2pt/osu_latency
+mpiexec -n 2 --map-by ppr:2:socket ../osu-micro-benchmarks-5.6.2/mpi/pt2pt/osu_latency
