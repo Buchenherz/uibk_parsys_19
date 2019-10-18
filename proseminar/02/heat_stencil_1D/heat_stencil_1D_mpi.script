@@ -1,0 +1,39 @@
+#!/bin/bash
+
+# Select queue. There are three queues available.
+# std.q is the general purpose and default queue with a maximum runtime of 240 hours.
+# short.q is for small tests jobs, has a limited number of CPU slots and a max runtime of 10 hours.
+# bigmem.q is for Leo3e. Max runtime of 240 hours with 512GB memory nodes.
+#$ -q std.q
+
+# The batch system should use the current directory as working directory. Makes it
+# easier to handle files
+#$ -cwd
+
+# Name the job. Unless you use the -o and -e options, output will
+# go to a unique file name.ojob_id for each job.
+#$ -N heat_stencil_1D_mpi
+
+# Redirect output stream to this file. Useful for debugging, simple output, etc.
+#$ -o heat_stencil_1D_mpi.out
+
+# Redirect error stream to this file.
+#$ -e error.dat
+
+# Join the error stream to the output stream.
+#$ -j yes
+
+# Specifies the parallel environment. A list is available with qconf -spl. In this case
+# 2 slots per node, with 2 slots in total
+#$ -pe openmpi-2perhost 2
+
+# check whether the syntax of the job is okay (do not submit the job)
+# #$ -w v
+
+# Load module because the software can be run on another system and not in the current
+# ssh session
+# load module
+module load openmpi/4.0.1
+
+# Execute the software on 2 slots
+mpiexec -n 2 -map-by ppr:2:socket $PWD/heat_stencil_1D_mpi
