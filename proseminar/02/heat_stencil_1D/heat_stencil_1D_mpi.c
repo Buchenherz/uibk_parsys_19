@@ -37,13 +37,13 @@ int main(int argc, char **argv) {
   int local_N = N/size;
   int T = N * 500;
   // create a buffer for storing temperature fields
-  Vector A;
+  Vector A = createVector(N);
   
   if (rank == 0) {
     printf("Computing heat-distribution for room size N=%d for T=%d timesteps\n", N, T);
 
     // ---------- setup ----------
-    A = createVector(N);
+
     // set up initial conditions in A
     for (int i = 0; i < N; i++) {
       A[i] = 273; // temperature is 0° C everywhere (273 K)
@@ -61,36 +61,31 @@ int main(int argc, char **argv) {
   // ---------- compute ----------
 
   // create a second buffer for the computation
-  Vector local_A = createVector(local_N+1);
-  Vector local_B = createVector(local_N+1);
+  Vector B = createVector(N);
 
   // for each time step ..
   for (int t = 0; t < T; t++) {
-    MPI_Scatter(A, local_N, MPI_DOUBLE, local_A, local_N, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    MPI_Bcast(A,N,MPI_DOUBLE,0,MPI_COMM_WORLD);
     // .. we propagate the temperature
-    for (long long i = 0; i < local_N; i++) {
+    for (long long i = local_N*rank; i < local_N*(rank+1); i++) {
       // center stays constant (the heat is still on)
-      if (local_A[i] == (273 + 60)) {
-        local_B[i] = local_A[i];
+      if (A[i] == (273 + 60)) {
+        B[i] = A[i];
         continue;
       }
 
       // get temperature at current position
-      value_t tc = local_A[i];
+      value_t tc = A[i];
 
       // get temperatures of adjacent cells
-      value_t tl = (i != 0) ? local_A[i - 1] : tc;
-      value_t tr = (i != N - 1) ? local_A[i + 1] : tc;
+      value_t tl = (i != 0) ? A[i - 1] : tc;
+      value_t tr = (i != N - 1) ? A[i + 1] : tc;
 
       // compute new temperature at current position
-      local_B[i] = tc + 0.2 * (tl + tr + (-2 * tc));
+      B[i] = tc + 0.2 * (tl + tr + (-2 * tc));
     }
 
-    MPI_Gather(local_B, local_N, MPI_DOUBLE, A, local_N, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-    // swap matrices (just pointers, not content)
-    // Vector H = A;
-    // A = local_B;
-    // local_B = H;
+    MPI_Reduce(B, A, N, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
 
     // show intermediate step
     if ((rank == 0) && !(t % 1000)) {
@@ -100,8 +95,7 @@ int main(int argc, char **argv) {
     }
   }
 
-  releaseVector(local_A);
-  releaseVector(local_B);
+  releaseVector(B);
 
   if (rank == 0) {
     // ---------- check ----------
@@ -128,6 +122,7 @@ int main(int argc, char **argv) {
     // done
     return (success) ? EXIT_SUCCESS : EXIT_FAILURE;
   }
+  releaseVector(A);
   return EXIT_SUCCESS;
 }
 
