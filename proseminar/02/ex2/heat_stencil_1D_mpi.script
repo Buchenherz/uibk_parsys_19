@@ -25,7 +25,7 @@
 
 # Specifies the parallel environment. A list is available with qconf -spl. In this case
 # 2 slots per node, with 2 slots in total
-#$ -pe openmpi-2perhost 2
+#$ -pe openmpi-8perhost 8
 
 # check whether the syntax of the job is okay (do not submit the job)
 # #$ -w v
@@ -34,6 +34,9 @@
 # ssh session
 # load module
 module load openmpi/4.0.1
+module load gcc
+
+mpic++ heat_stencil_1D_mpi.c -o heat_stencil_1D_mpi.o -lm
 
 # Execute the software on 2 slots
-mpiexec -n 2 -map-by ppr:2:socket $PWD/heat_stencil_1D_mpi
+mpiexec -n 8 ./heat_stencil_1D_mpi.o

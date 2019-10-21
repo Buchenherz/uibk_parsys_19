@@ -18,10 +18,11 @@ void printTemperature(Vector m, int N);
 
 // -- simulation code ---
 
-int main(int argc, char **argv) {
+int main(int argc, char **argv)
+{
   printf("Hello");
   // region OPENMPI INIT
-  MPI_Init(&argc, &argv);  //initialize the MPI environment
+  MPI_Init(&argc, &argv); //initialize the MPI environment
   int size;
   MPI_Comm_size(MPI_COMM_WORLD, &size); //get the number of ranks
   int rank;
@@ -31,28 +32,30 @@ int main(int argc, char **argv) {
 
   // 'parsing' optional input parameter = problem size
   int N = 2000;
-  if (argc > 1) {
+  if (argc > 1)
+  {
     N = atoi(argv[1]);
   }
-  int local_N = N/size;
+  int local_N = N / size;
   int T = N * 500;
   // create a buffer for storing temperature fields
   Vector A = createVector(N);
-  
-  if (rank == 0) {
+
+  if (rank == 0)
+  {
     printf("Computing heat-distribution for room size N=%d for T=%d timesteps\n", N, T);
 
     // ---------- setup ----------
 
     // set up initial conditions in A
-    for (int i = 0; i < N; i++) {
+    for (int i = 0; i < N; i++)
+    {
       A[i] = 273; // temperature is 0° C everywhere (273 K)
     }
 
     // and there is a heat source in one corner
     int source_x = N / 4;
     A[source_x] = 273 + 60;
-
 
     printf("Initial:\t");
     printTemperature(A, N);
@@ -64,12 +67,15 @@ int main(int argc, char **argv) {
   Vector B = createVector(N);
 
   // for each time step ..
-  for (int t = 0; t < T; t++) {
-    MPI_Bcast(A,N,MPI_DOUBLE,0,MPI_COMM_WORLD);
+  for (int t = 0; t < T; t++)
+  {
+    MPI_Bcast(A, N, MPI_DOUBLE, 0, MPI_COMM_WORLD);
     // .. we propagate the temperature
-    for (long long i = local_N*rank; i < local_N*(rank+1); i++) {
+    for (long long i = local_N * rank; i < local_N * (rank + 1); i++)
+    {
       // center stays constant (the heat is still on)
-      if (A[i] == (273 + 60)) {
+      if (A[i] == (273 + 60))
+      {
         B[i] = A[i];
         continue;
       }
@@ -88,7 +94,8 @@ int main(int argc, char **argv) {
     MPI_Reduce(B, A, N, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
 
     // show intermediate step
-    if ((rank == 0) && !(t % 1000)) {
+    if ((rank == 0) && !(t % 1000))
+    {
       printf("Step t=%d:\t", t);
       printTemperature(A, N);
       printf("\n");
@@ -97,7 +104,8 @@ int main(int argc, char **argv) {
 
   releaseVector(B);
 
-  if (rank == 0) {
+  if (rank == 0)
+  {
     // ---------- check ----------
 
     printf("Final:\t\t");
@@ -105,7 +113,8 @@ int main(int argc, char **argv) {
     printf("\n");
 
     int success = 1;
-    for (long long i = 0; i < N; i++) {
+    for (long long i = 0; i < N; i++)
+    {
       value_t temp = A[i];
       if (273 <= temp && temp <= 273 + 60)
         continue;
@@ -114,7 +123,7 @@ int main(int argc, char **argv) {
     }
 
     printf("Verification: %s\n", (success) ? "OK" : "FAILED");
-  
+
     // ---------- cleanup ----------
 
     releaseVector(A);
@@ -126,14 +135,16 @@ int main(int argc, char **argv) {
   return EXIT_SUCCESS;
 }
 
-Vector createVector(int N) {
+Vector createVector(int N)
+{
   // create data and index vector
-  return malloc(sizeof(value_t) * N);
+  return (Vector)malloc(sizeof(value_t) * N);
 }
 
 void releaseVector(Vector m) { free(m); }
 
-void printTemperature(Vector m, int N) {
+void printTemperature(Vector m, int N)
+{
   const char *colors = " .-:=+*^X#%@";
   const int numColors = 12;
 
@@ -151,10 +162,12 @@ void printTemperature(Vector m, int N) {
   // left wall
   printf("X");
   // actual room
-  for (int i = 0; i < W; i++) {
+  for (int i = 0; i < W; i++)
+  {
     // get max temperature in this tile
     value_t max_t = 0;
-    for (int x = sW * i; x < sW * i + sW; x++) {
+    for (int x = sW * i; x < sW * i + sW; x++)
+    {
       max_t = (max_t < m[x]) ? m[x] : max_t;
     }
     value_t temp = max_t;
