@@ -17,10 +17,12 @@ void printTemperature(Vector m, int N);
 
 // -- simulation code ---
 
-int main(int argc, char **argv) {
+int main(int argc, char **argv)
+{
   // 'parsing' optional input parameter = problem size
   int N = 2000;
-  if (argc > 1) {
+  if (argc > 1)
+  {
     N = atoi(argv[1]);
   }
   int T = N * 500;
@@ -32,7 +34,8 @@ int main(int argc, char **argv) {
   Vector A = createVector(N);
 
   // set up initial conditions in A
-  for (int i = 0; i < N; i++) {
+  for (int i = 0; i < N; i++)
+  {
     A[i] = 273; // temperature is 0° C everywhere (273 K)
   }
 
@@ -50,11 +53,14 @@ int main(int argc, char **argv) {
   Vector B = createVector(N);
 
   // for each time step ..
-  for (int t = 0; t < T; t++) {
+  for (int t = 0; t < T; t++)
+  {
     // .. we propagate the temperature
-    for (long long i = 0; i < N; i++) {
+    for (long long i = 0; i < N; i++)
+    {
       // center stays constant (the heat is still on)
-      if (i == source_x) {
+      if (i == source_x)
+      {
         B[i] = A[i];
         continue;
       }
@@ -76,7 +82,8 @@ int main(int argc, char **argv) {
     B = H;
 
     // show intermediate step
-    if (!(t % 1000)) {
+    if (!(t % 1000))
+    {
       printf("Step t=%d:\t", t);
       printTemperature(A, N);
       printf("\n");
@@ -92,7 +99,8 @@ int main(int argc, char **argv) {
   printf("\n");
 
   int success = 1;
-  for (long long i = 0; i < N; i++) {
+  for (long long i = 0; i < N; i++)
+  {
     value_t temp = A[i];
     if (273 <= temp && temp <= 273 + 60)
       continue;
@@ -110,14 +118,16 @@ int main(int argc, char **argv) {
   return (success) ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 
-Vector createVector(int N) {
+Vector createVector(int N)
+{
   // create data and index vector
   return malloc(sizeof(value_t) * N);
 }
 
 void releaseVector(Vector m) { free(m); }
 
-void printTemperature(Vector m, int N) {
+void printTemperature(Vector m, int N)
+{
   const char *colors = " .-:=+*^X#%@";
   const int numColors = 12;
 
@@ -135,10 +145,12 @@ void printTemperature(Vector m, int N) {
   // left wall
   printf("X");
   // actual room
-  for (int i = 0; i < W; i++) {
+  for (int i = 0; i < W; i++)
+  {
     // get max temperature in this tile
     value_t max_t = 0;
-    for (int x = sW * i; x < sW * i + sW; x++) {
+    for (int x = sW * i; x < sW * i + sW; x++)
+    {
       max_t = (max_t < m[x]) ? m[x] : max_t;
     }
     value_t temp = max_t;

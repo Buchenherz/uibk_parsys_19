@@ -28,6 +28,9 @@
 # ssh session
 # load module
 module load openmpi/4.0.1
+module load gcc
+
+mpic++ pi_mpi.c -o pi_mpi.o -lm
 
 # Execute the software on 2 slots
-mpiexec -n 2 -map-by ppr:2:socket $PWD/pi_mpi
+mpiexec -n 2 -map-by ppr:2:socket ./pi_mpi.o 1000000000

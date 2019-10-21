@@ -1,13 +1,13 @@
-EXECS=pi_mpi
-MPICC=mpicc
-FLAGS=lm
+MPICC=mpic++
+FLAGS=-lm
+SHELL=/bin/bash
+OBJECTS=pi_mpi.o pi_seq.o 
 
-all: $(EXECS)
+all: mpi seq
 
-$(EXECS): pi_mpi.o
-	module load openmpi/4.0.1
-	$(MPICC) pi_mpi.c -o $(EXECS) $(FLAGS)
+seq: pi_seq.o
+	gcc pi_seq.c -o pi_seq $(FLAGS)
 
 .PHONY: clean
 clean:
-	rm $(EXECS)
+	rm $(OBJECTS)
