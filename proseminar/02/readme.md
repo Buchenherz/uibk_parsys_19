@@ -16,6 +16,10 @@ There are many ways of approximating π, one being a well-known Monte Carlo meth
 
 - Write a sequential application `pi_seq` in C or C++ that computes π for a given number of samples (command line argument). Test your application for various, large sample sizes to verify the correctness of your implementation.
 - Consider a parallelization strategy using MPI. Which communication pattern(s) would you choose and why?
+
+MPI_Reduce with SUM - because we need to divide all hits, which were computed per node, by all generated points.
+Hence, we are only sending one unsigned long int per Node.
+
 - Implement your chosen parallelization strategy as a second application `pi_mpi`. Run it with varying numbers of ranks and sample sizes and verify its correctness by comparing the output to `pi_seq`.
 - Discuss the effects and implications of your parallelization.
 
@@ -33,8 +37,18 @@ A large class of scientific applications are so-called stencil applications. The
 
 - A sequential implementation of a 1-D heat stencil is available in [heat_stencil_1D_seq.c](heat_stencil_1D/heat_stencil_1D_seq.c). Read the code and make sure you understand what happens. See the Wikipedia article on [Stencil Codes](https://en.wikipedia.org/wiki/Stencil_code) for more information.
 - Consider a parallelization strategy using MPI. Which communication pattern(s) would you choose and why? Are there additional changes required in the code beyond calling MPI functions? If so, elaborate!
+
+We chose MPI_Bcast and MPI_Reduce.
+MPI_Scatter can only slice an array into parts, but the previous and next element of the distributed array is also needed (which is not possible) - so we used Broadcast to distribute the whole array.
+(Another way would be MPI_Send with a scatterlike behavior)
+
+Because the exercise is about heating, we used Reduce with MAX, if it was about cooling we would have chosen MIN.
+(Another way would be MPI_Rec with a gatherlike behavior)
+
 - Implement your chosen parallelization strategy as a second application `heat_stencil_1D_mpi`. Run it with varying numbers of ranks and problem sizes and verify its correctness by comparing the output to `heat_stencil_1D_seq`.
 - Discuss the effects and implications of your parallelization.
+Broadcast and Reduce are rather expensive communications - and even more time consuming when they are used on arrays filled with doubles.
+A scatter- and gatherlike communication would be better, when we have to compute a really long array on many nodes.
 
 ## General Notes
 
