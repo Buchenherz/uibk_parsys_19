@@ -47,10 +47,31 @@ int main(int argc, char **argv)
   // region OPENMPI INIT
   int number_of_ranks;
   int rank;
+
   MPI_Init(&argc, &argv);                          //initialize the MPI environment
   MPI_Comm_size(MPI_COMM_WORLD, &number_of_ranks); //get the number of ranks
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);            //get the rankof the caller
-  printf("Rank %d of %d online\n", rank, number_of_ranks);
+
+  // Cartesian communicator
+  MPI_Comm comm_cart;
+  int ndims = 2;
+  int dims[2] = {1, number_of_ranks};
+  int periods[2] = {0, 0};
+  int reorder = 0;
+
+  MPI_Cart_create(MPI_COMM_WORLD, ndims, dims, periods, reorder, &comm_cart);
+
+  // calc upper / lower rank
+  // If value is negative, rank is first or last in topology
+  int upper_rank;
+  int lower_rank;
+
+  MPI_Cart_shift(comm_cart, 1, 1, &upper_rank, &lower_rank);
+
+  printf("%d, %d\n", lower_rank, upper_rank);
+
+  printf("Rank %d of %d online\n", rank, number_of_ranks - 1);
+  return 1;
   // endregion
 
   if (rank == 0)
@@ -108,7 +129,8 @@ int main(int argc, char **argv)
     // .. we propagate the temperature
     for (long long i = local_m_start; i < local_m_end; i++)
     {
-      // send rows here
+      // send / receive rows here
+
       for (long long j = 0; j < N; j++)
       {
         // center stays constant (the heat is still on)
