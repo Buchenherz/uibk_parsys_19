@@ -35,8 +35,8 @@ int *getRowSizePerRank(int M, int number_of_ranks);
 int main(int argc, char **argv)
 {
   // 'parsing' optional input parameter = problem size
-  int N = 300; // columns
-  int M = 100; // rows
+  int N = 10; // columns
+  int M = 5;  // rows
   if (argc > 1)
   {
     N = atoi(argv[1]);
@@ -51,6 +51,10 @@ int main(int argc, char **argv)
   MPI_Init(&argc, &argv);                          //initialize the MPI environment
   MPI_Comm_size(MPI_COMM_WORLD, &number_of_ranks); //get the number of ranks
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);            //get the rankof the caller
+
+  MPI_Datatype row;
+  MPI_Type_vector(N, 1, 1, MPI_DOUBLE, &row);
+  MPI_Type_commit(&row);
 
   // Cartesian communicator
   MPI_Comm comm_cart;
@@ -71,7 +75,7 @@ int main(int argc, char **argv)
   printf("%d, %d\n", lower_rank, upper_rank);
 
   printf("Rank %d of %d online\n", rank, number_of_ranks - 1);
-  return 1;
+
   // endregion
 
   if (rank == 0)
@@ -100,9 +104,9 @@ int main(int argc, char **argv)
   int source_y = M / 8;
   A[source_y][source_x] = 273 + 60;
 
-  printf("Initial:\t");
-  printTemperature(A, N, M);
-  printf("\n");
+  // printf("Initial:\t");
+  // printTemperature(A, N, M);
+  // printf("\n");
 
   // ---------- compute ----------
 
@@ -122,14 +126,62 @@ int main(int argc, char **argv)
     sum = sum + rank_row_sizes[i];
   }
   int local_m_end = sum + rank_row_sizes[rank];
+  int local_first_row_index = local_m_start;
+  int local_last_row_index = local_m_end - 1;
 
+  printf("LLRI %d, LFRI %d\n", local_last_row_index, local_first_row_index);
+  printf("LMS %d, LME %d\n", local_m_start, local_m_end);
   // for each time step ..
   for (int t = 0; t < T; t++)
   {
+    // send / receive rows here
+    // rows that will be added on top / below local rows
+    double received_upper_row[N];
+    double received_lower_row[N];
+
+    if (upper_rank < 0)
+    {
+      /* Upper rank does not exist, only receive one from below and send one to below */
+      // printf("Local last row index: %d \n", local_last_row_index);
+      // for (int i = 0; i < N; i++)
+      // {
+      //   printf("Send %f, ", A[local_last_row_index][i]);
+      // }
+      // printf("\n");
+      MPI_Send(A[local_last_row_index], 1, row, lower_rank, 0, MPI_COMM_WORLD);
+      MPI_Recv(received_lower_row, 1, row, lower_rank, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+      A[local_last_row_index] = received_lower_row;
+    }
+    else if (lower_rank < 0)
+    {
+      /* Lower rank does not exist, only receive one from above and send one to above */
+      MPI_Recv(received_upper_row, 1, row, upper_rank, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+      MPI_Send(A[local_last_row_index], 1, row, upper_rank, 0, MPI_COMM_WORLD);
+      A[local_first_row_index] = received_upper_row;
+      // for (int i = 0; i < N; i++)
+      // {
+      //   printf("Recv: %f, ", received_upper_row[i]);
+      // }
+    }
+    else
+    {
+      MPI_Request request;
+      /* Upper and lower ranks exist, send and receive both */
+      MPI_Isend(A[local_first_row_index], 1, row, upper_rank, 0, MPI_COMM_WORLD, &request);
+      MPI_Isend(A[local_last_row_index], 1, row, lower_rank, 0, MPI_COMM_WORLD, &request);
+      MPI_Recv(received_upper_row, 1, row, upper_rank, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+      MPI_Recv(received_lower_row, 1, row, lower_rank, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+      A[local_first_row_index] = received_upper_row;
+      A[local_last_row_index] = received_lower_row;
+      // for (int i = 0; i < N; i++)
+      // {
+      //   printf("Recv: %f, ", received_upper_row[i]);
+      // }
+    }
+
     // .. we propagate the temperature
     for (long long i = local_m_start; i < local_m_end; i++)
     {
-      // send / receive rows here
 
       for (long long j = 0; j < N; j++)
       {
@@ -162,9 +214,9 @@ int main(int argc, char **argv)
     // show intermediate step
     if (!(t % 1000))
     {
-      printf("Step t=%d:\n", t);
-      printTemperature(A, N, M);
-      printf("\n");
+      // printf("Step t=%d:\n", t);
+      // printTemperature(A, N, M);
+      // printf("\n");
     }
   }
 
@@ -195,7 +247,7 @@ int main(int argc, char **argv)
 
   releaseMatrix(A);
   free(rank_row_sizes);
-
+  MPI_Type_free(&row);
   MPI_Finalize(); //cleanup
 
   // done
