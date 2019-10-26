@@ -35,7 +35,7 @@ int *getRowSizePerRank(int M, int number_of_ranks);
 int main(int argc, char **argv)
 {
   // 'parsing' optional input parameter = problem size
-  int N = 100; // columns
+  int N = 300; // columns
   int M = 100; // rows
   if (argc > 1)
   {
@@ -220,34 +220,113 @@ int main(int argc, char **argv)
     // show intermediate step
     if (!(t % 1000))
     {
-      printf("Step t=%d:\n", t);
-      printTemperature(A, N, M);
-      printf("\n");
+      if (rank == 0)
+      {
+
+        Matrix comb = createMatrix(N, M);
+
+        for (int i = 0; i < local_m_end; i++)
+        {
+          comb[i] = A[i];
+        }
+
+        for (int orank = 1; orank < number_of_ranks; orank++)
+        {
+          Matrix recv = createMatrix(N, M);
+          // printf("\nRecv array %d\n", i);
+          MPI_Recv(&(recv[0][0]), N * M, MPI_DOUBLE, orank, 1, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+          int sum = 0;
+          for (int j = 0; j < orank; j++)
+          {
+            sum = sum + rank_row_sizes[j];
+          }
+          int o_m_start = sum;
+          int o_m_end = sum + rank_row_sizes[orank];
+          // printf("omstart %d, omend %d\n", o_m_start, o_m_end);
+          for (int k = o_m_start; k < o_m_end; k++)
+          {
+            comb[k] = recv[k];
+          }
+          free(recv);
+        }
+
+        printf("Step t=%d:\n", t);
+        printTemperature(comb, N, M);
+        printf("\n");
+        free(comb);
+      }
+      else
+      {
+        // printf("\nSend array %d\n", rank);
+        // MPI_Request req;
+        MPI_Send(&(A[0][0]), N * M, MPI_DOUBLE, 0, 1, MPI_COMM_WORLD);
+        //MPI_Wait(&req, MPI_STATUS_IGNORE);
+      }
     }
   }
-
   releaseMatrix(B);
 
   // ---------- check ----------
-
-  printf("Final:\n");
-  printTemperature(A, N, M);
-  printf("\n");
-
-  int success = 1;
-  for (long long i = 0; i < M; i++)
+  int success;
+  if (rank == 0)
   {
-    for (long long j = 0; j < N; j++)
-    {
-      value_t temp = A[i][j];
-      if (273 <= temp && temp <= 273 + 60)
-        continue;
-      success = 0;
-      break;
-    }
-  }
 
-  printf("Verification: %s\n", (success) ? "OK" : "FAILED");
+    Matrix comb = createMatrix(N, M);
+
+    for (size_t i = 0; i < local_m_end; i++)
+    {
+      comb[i] = A[i];
+    }
+
+    for (int orank = 1; orank < number_of_ranks; orank++)
+    {
+      Matrix recv = createMatrix(N, M);
+      // printf("\nRecv array %d\n", i);
+      MPI_Recv(&(recv[0][0]), N * M, MPI_DOUBLE, orank, 1, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+      int sum = 0;
+      for (int j = 0; j < orank; j++)
+      {
+        sum = sum + rank_row_sizes[j];
+      }
+      int o_m_start = sum;
+      int o_m_end = sum + rank_row_sizes[orank];
+      //printf("omstart %d, omend %d\n", o_m_start, o_m_end);
+      for (int k = o_m_start; k < o_m_end; k++)
+      {
+        comb[k] = recv[k];
+      }
+      releaseMatrix(recv);
+    }
+
+    printf("Final\n");
+    printTemperature(comb, N, M);
+    printf("\n");
+
+    int success = 1;
+    for (long long i = 0; i < M; i++)
+    {
+      for (long long j = 0; j < N; j++)
+      {
+        value_t temp = comb[i][j];
+        if (273 <= temp && temp <= 273 + 60)
+          continue;
+        success = 0;
+        printf("temp: %f, i: %d, j: %d \n", temp, i, j);
+        break;
+      }
+    }
+
+    printf("Verification: %s\n", (success) ? "OK" : "FAILED");
+
+    releaseMatrix(comb);
+  }
+  else
+  {
+    // printf("\nSend array %d\n", rank);
+    //MPI_Request req;
+    MPI_Send(&(A[0][0]), N * M, MPI_DOUBLE, 0, 1, MPI_COMM_WORLD);
+    //MPI_Wait(&req, MPI_STATUS_IGNORE);
+  }
 
   // ---------- cleanup ----------
 
