@@ -72,7 +72,7 @@ int main(int argc, char **argv)
 
   MPI_Cart_shift(comm_cart, 1, 1, &upper_rank, &lower_rank);
 
-  printf("%d, %d\n", lower_rank, upper_rank);
+  printf("rank %d, %d, %d\n", rank, upper_rank, lower_rank);
 
   printf("Rank %d of %d online\n", rank, number_of_ranks - 1);
 
@@ -154,35 +154,29 @@ int main(int argc, char **argv)
     if (upper_rank < 0)
     {
       /* Upper rank does not exist, only receive one from below and send one to below */
-      // printf("Local last row index: %d \n", local_last_row_index);
-      // for (int i = 0; i < N; i++)
-      // {
-      //   printf("Send %f, ", A[local_last_row_index][i]);
-      // }
-      // printf("\n");
-      MPI_Send(A[local_last_row_index], 1, row, lower_rank, 0, MPI_COMM_WORLD);
-      MPI_Recv(received_lower_row, 1, row, lower_rank, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+      MPI_Send(A[local_last_row_index], 1, row, lower_rank, 0, comm_cart);
+      MPI_Recv(received_lower_row, 1, row, lower_rank, 0, comm_cart, MPI_STATUS_IGNORE);
+
+      /* Received the last local row from the lower rank, appending it as the new last local row */
       A[local_last_row_index + 1] = received_lower_row;
     }
     else if (lower_rank < 0)
     {
       /* Lower rank does not exist, only receive one from above and send one to above */
-      MPI_Recv(received_upper_row, 1, row, upper_rank, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-      MPI_Send(A[local_last_row_index], 1, row, upper_rank, 0, MPI_COMM_WORLD);
+      MPI_Recv(received_upper_row, 1, row, upper_rank, 0, comm_cart, MPI_STATUS_IGNORE);
+      MPI_Send(A[local_first_row_index], 1, row, upper_rank, 0, comm_cart);
+
+      /* Received the first local row from the upper rank, appending it as the new last local row */
       A[local_first_row_index - 1] = received_upper_row;
-      // for (int i = 0; i < N; i++)
-      // {
-      //   printf("Recv: %f, ", received_upper_row[i]);
-      // }
     }
     else
     {
       MPI_Request request;
       /* Upper and lower ranks exist, send and receive both */
-      MPI_Isend(A[local_first_row_index], 1, row, upper_rank, 0, MPI_COMM_WORLD, &request);
-      MPI_Isend(A[local_last_row_index], 1, row, lower_rank, 0, MPI_COMM_WORLD, &request);
-      MPI_Recv(received_upper_row, 1, row, upper_rank, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-      MPI_Recv(received_lower_row, 1, row, lower_rank, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+      MPI_Isend(A[local_first_row_index], 1, row, upper_rank, 0, comm_cart, &request);
+      MPI_Isend(A[local_last_row_index], 1, row, lower_rank, 0, comm_cart, &request);
+      MPI_Recv(received_upper_row, 1, row, upper_rank, 0, comm_cart, MPI_STATUS_IGNORE);
+      MPI_Recv(received_lower_row, 1, row, lower_rank, 0, comm_cart, MPI_STATUS_IGNORE);
       A[local_first_row_index - 1] = received_upper_row;
       A[local_last_row_index + 1] = received_lower_row;
       // for (int i = 0; i < N; i++)
@@ -226,9 +220,9 @@ int main(int argc, char **argv)
     // show intermediate step
     if (!(t % 1000))
     {
-      // printf("Step t=%d:\n", t);
-      // printTemperature(A, N, M);
-      // printf("\n");
+      printf("Step t=%d:\n", t);
+      printTemperature(A, N, M);
+      printf("\n");
     }
   }
 
