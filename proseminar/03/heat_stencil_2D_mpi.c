@@ -35,8 +35,8 @@ int *getRowSizePerRank(int M, int number_of_ranks);
 int main(int argc, char **argv)
 {
   // 'parsing' optional input parameter = problem size
-  int N = 10; // columns
-  int M = 10; // rows
+  int N = 100; // columns
+  int M = 100; // rows
   if (argc > 1)
   {
     N = atoi(argv[1]);
@@ -162,14 +162,14 @@ int main(int argc, char **argv)
       // printf("\n");
       MPI_Send(A[local_last_row_index], 1, row, lower_rank, 0, MPI_COMM_WORLD);
       MPI_Recv(received_lower_row, 1, row, lower_rank, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-      A[local_last_row_index] = received_lower_row;
+      A[local_last_row_index + 1] = received_lower_row;
     }
     else if (lower_rank < 0)
     {
       /* Lower rank does not exist, only receive one from above and send one to above */
       MPI_Recv(received_upper_row, 1, row, upper_rank, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
       MPI_Send(A[local_last_row_index], 1, row, upper_rank, 0, MPI_COMM_WORLD);
-      A[local_first_row_index] = received_upper_row;
+      A[local_first_row_index - 1] = received_upper_row;
       // for (int i = 0; i < N; i++)
       // {
       //   printf("Recv: %f, ", received_upper_row[i]);
@@ -183,8 +183,8 @@ int main(int argc, char **argv)
       MPI_Isend(A[local_last_row_index], 1, row, lower_rank, 0, MPI_COMM_WORLD, &request);
       MPI_Recv(received_upper_row, 1, row, upper_rank, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
       MPI_Recv(received_lower_row, 1, row, lower_rank, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-      A[local_first_row_index] = received_upper_row;
-      A[local_last_row_index] = received_lower_row;
+      A[local_first_row_index - 1] = received_upper_row;
+      A[local_last_row_index + 1] = received_lower_row;
       // for (int i = 0; i < N; i++)
       // {
       //   printf("Recv: %f, ", received_upper_row[i]);
