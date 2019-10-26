@@ -36,7 +36,7 @@ int main(int argc, char **argv)
 {
   // 'parsing' optional input parameter = problem size
   int N = 10; // columns
-  int M = 5;  // rows
+  int M = 10; // rows
   if (argc > 1)
   {
     N = atoi(argv[1]);
@@ -85,6 +85,11 @@ int main(int argc, char **argv)
 
   int *rank_row_sizes = getRowSizePerRank(M, number_of_ranks);
 
+  for (size_t i = 0; i < number_of_ranks; i++)
+  {
+    printf("%d ", rank_row_sizes[i]);
+  }
+
   // ---------- setup ----------
 
   // create a buffer for storing temperature fields
@@ -115,21 +120,28 @@ int main(int argc, char **argv)
 
   // Set start and end row for each rank
   // rank 0 starts from 0 and goes to rrs[1] - 1
-  int local_m_start = 0;
-  if (rank != 0)
+  int local_m_start;
+  int local_m_end;
+  if (rank == 0)
   {
-    local_m_start = rank_row_sizes[rank];
+    local_m_start = 0;
+    local_m_end = rank_row_sizes[0];
   }
-  int sum = 0;
-  for (int i = 0; i < rank; i++)
+  else
   {
-    sum = sum + rank_row_sizes[i];
+    int sum = 0;
+    for (int i = 0; i < rank; i++)
+    {
+      sum = sum + rank_row_sizes[i];
+    }
+    local_m_start = sum;
+    local_m_end = sum + rank_row_sizes[rank];
   }
-  int local_m_end = sum + rank_row_sizes[rank];
+
   int local_first_row_index = local_m_start;
   int local_last_row_index = local_m_end - 1;
 
-  printf("LLRI %d, LFRI %d\n", local_last_row_index, local_first_row_index);
+  printf("LFRI %d, LLRI %d\n", local_first_row_index, local_last_row_index);
   printf("LMS %d, LME %d\n", local_m_start, local_m_end);
   // for each time step ..
   for (int t = 0; t < T; t++)
