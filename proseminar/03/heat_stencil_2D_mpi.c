@@ -368,31 +368,6 @@ int main(int argc, char **argv)
   }
   else
   {
-    // printf("\nSend array %d\n", rank);
-    //MPI_Request req;
-    // for (size_t k = 0; k < M; k++)
-    // {
-    //   for (size_t a = 0; a < N; a++)
-    //   {
-    //     printf("%f ", A[k][a]);
-    //     /* code */
-    //   }
-    //   printf("\n");
-    //   /* code */
-    // }
-    // printf("\n");
-    // Matrix send = createMatrix(N, M);
-    // printf("Rank 0 rows:\n");
-    // for (size_t i = local_m_start; i < local_m_end; i++)
-    // {
-    //   send[i] = A[i];
-    //   for (size_t k = 0; k < N; k++)
-    //   {
-    //     printf("%f ", send[i][k]);
-    //     /* code */
-    //   }
-    //   printf("\n");
-    // }
 
     value_t array[M][N];
     for (size_t i = 0; i < M; i++)
