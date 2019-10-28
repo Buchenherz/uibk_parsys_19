@@ -135,14 +135,6 @@ int main(int argc, char **argv)
   
   int local_first_row_index = local_m_start;
   int local_last_row_index = local_m_end;
-  // if (rank != 0)
-  // {
-  //   local_m_start = local_m_start - 1;
-  //   local_m_end = rank_row_sizes[0];
-  // }
-  // if (rank != number_of_ranks-1){
-  //   local_m_end++;
-  // }
 
   printf("LFRI %d, LLRI %d\n", local_first_row_index, local_last_row_index);
   printf("LMS %d, LME %d\n", local_m_start, local_m_end);
