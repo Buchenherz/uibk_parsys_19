@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <mpi.h>
+#include <unistd.h>
 
 typedef double value_t;
 
@@ -35,8 +36,8 @@ int *getRowSizePerRank(int M, int number_of_ranks);
 int main(int argc, char **argv)
 {
   // 'parsing' optional input parameter = problem size
-  int N = 300; // columns
-  int M = 100; // rows
+  int N = 10; // columns
+  int M = 10; // rows
   if (argc > 1)
   {
     N = atoi(argv[1]);
@@ -56,6 +57,12 @@ int main(int argc, char **argv)
   MPI_Type_vector(N, 1, 1, MPI_DOUBLE, &row);
   MPI_Type_commit(&row);
 
+  MPI_Datatype myType;
+  int size[2] = {M, N};
+  int subSize[2] = {M, N};
+  int start[2] = {0, 0};
+  MPI_Type_create_subarray(2, size, subSize, start, MPI_ORDER_C, MPI_DOUBLE, &myType);
+  MPI_Type_commit(&myType);
   // Cartesian communicator
   MPI_Comm comm_cart;
   int ndims = 2;
@@ -159,6 +166,11 @@ int main(int argc, char **argv)
 
       /* Received the last local row from the lower rank, appending it as the new last local row */
       A[local_last_row_index + 1] = received_lower_row;
+      // for (int index = 0; index < N; index++)
+      // {
+      //   printf("Recv: %f, ", received_lower_row[index]);
+      // }
+      // printf("\n");
     }
     else if (lower_rank < 0)
     {
@@ -168,6 +180,12 @@ int main(int argc, char **argv)
 
       /* Received the first local row from the upper rank, appending it as the new last local row */
       A[local_first_row_index - 1] = received_upper_row;
+
+      // for (int index = 0; index < N; index++)
+      // {
+      //   printf("Recv: %f, ", received_upper_row[index]);
+      // }
+      // printf("\n");
     }
     else
     {
@@ -179,10 +197,16 @@ int main(int argc, char **argv)
       MPI_Recv(received_lower_row, 1, row, lower_rank, 0, comm_cart, MPI_STATUS_IGNORE);
       A[local_first_row_index - 1] = received_upper_row;
       A[local_last_row_index + 1] = received_lower_row;
-      // for (int i = 0; i < N; i++)
+      // for (int index = 0; index < N; index++)
       // {
-      //   printf("Recv: %f, ", received_upper_row[i]);
+      //   printf("Recv: %f, ", received_upper_row[index]);
       // }
+      // printf("\n");
+      // for (int index = 0; index < N; index++)
+      // {
+      //   printf("Recv: %f, ", received_lower_row[index]);
+      // }
+      // printf("\n");
     }
 
     // .. we propagate the temperature
@@ -218,7 +242,7 @@ int main(int argc, char **argv)
     B = H;
 
     // show intermediate step
-    if (!(t % 1000))
+    if (!(t % 1000) && false)
     {
       if (rank == 0)
       {
@@ -229,11 +253,10 @@ int main(int argc, char **argv)
         {
           comb[i] = A[i];
         }
-
         for (int orank = 1; orank < number_of_ranks; orank++)
         {
           Matrix recv = createMatrix(N, M);
-          // printf("\nRecv array %d\n", i);
+          printf("\nRecv array %d\n", orank);
           MPI_Recv(&(recv[0][0]), N * M, MPI_DOUBLE, orank, 1, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
           int sum = 0;
           for (int j = 0; j < orank; j++)
@@ -242,7 +265,7 @@ int main(int argc, char **argv)
           }
           int o_m_start = sum;
           int o_m_end = sum + rank_row_sizes[orank];
-          // printf("omstart %d, omend %d\n", o_m_start, o_m_end);
+          printf("\n omstart %d, omend %d\n", o_m_start, o_m_end);
           for (int k = o_m_start; k < o_m_end; k++)
           {
             comb[k] = recv[k];
@@ -265,66 +288,110 @@ int main(int argc, char **argv)
     }
   }
   releaseMatrix(B);
-
   // ---------- check ----------
-  int success;
+  int success = 1;
   if (rank == 0)
   {
 
     Matrix comb = createMatrix(N, M);
-
+    // printf("Rank 0 rows:\n");
     for (size_t i = 0; i < local_m_end; i++)
     {
       comb[i] = A[i];
     }
-
+    // sleep(1);
     for (int orank = 1; orank < number_of_ranks; orank++)
     {
+      printf("\n");
       Matrix recv = createMatrix(N, M);
-      // printf("\nRecv array %d\n", i);
-      MPI_Recv(&(recv[0][0]), N * M, MPI_DOUBLE, orank, 1, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+      printf("\nRecv array %d\n", orank);
+      MPI_Recv(&recv[0][0], 1, myType, orank, 1, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+
       int sum = 0;
       for (int j = 0; j < orank; j++)
       {
         sum = sum + rank_row_sizes[j];
       }
+
       int o_m_start = sum;
       int o_m_end = sum + rank_row_sizes[orank];
-      //printf("omstart %d, omend %d\n", o_m_start, o_m_end);
+      printf("omstart %d, omend %d\n", o_m_start, o_m_end);
       for (int k = o_m_start; k < o_m_end; k++)
       {
         comb[k] = recv[k];
+        for (size_t g = 0; g < N; g++)
+        {
+          printf("%f ", recv[k][g]);
+          /* code */
+        }
+        printf("\n");
       }
       releaseMatrix(recv);
+      printf("Freed matrix recv\n");
     }
 
     printf("Final\n");
-    printTemperature(comb, N, M);
+    //printTemperature(comb, N, M);
     printf("\n");
 
-    int success = 1;
     for (long long i = 0; i < M; i++)
     {
       for (long long j = 0; j < N; j++)
       {
         value_t temp = comb[i][j];
+        printf("%f ", temp);
         if (273 <= temp && temp <= 273 + 60)
           continue;
         success = 0;
-        printf("temp: %f, i: %d, j: %d \n", temp, i, j);
+        // printf("temp: %f, i: %lld, j: %lld \n", temp, i, j);
         break;
       }
+      printf("\n");
     }
 
     printf("Verification: %s\n", (success) ? "OK" : "FAILED");
-
     releaseMatrix(comb);
   }
   else
   {
     // printf("\nSend array %d\n", rank);
     //MPI_Request req;
-    MPI_Send(&(A[0][0]), N * M, MPI_DOUBLE, 0, 1, MPI_COMM_WORLD);
+    // for (size_t k = 0; k < M; k++)
+    // {
+    //   for (size_t a = 0; a < N; a++)
+    //   {
+    //     printf("%f ", A[k][a]);
+    //     /* code */
+    //   }
+    //   printf("\n");
+    //   /* code */
+    // }
+    // printf("\n");
+    // Matrix send = createMatrix(N, M);
+    // printf("Rank 0 rows:\n");
+    // for (size_t i = local_m_start; i < local_m_end; i++)
+    // {
+    //   send[i] = A[i];
+    //   for (size_t k = 0; k < N; k++)
+    //   {
+    //     printf("%f ", send[i][k]);
+    //     /* code */
+    //   }
+    //   printf("\n");
+    // }
+
+    value_t array[M][N];
+    for (size_t i = 0; i < M; i++)
+    {
+      for (size_t k = 0; k < N; k++)
+      {
+        array[i][k] = A[i][k];
+      }
+    }
+
+    MPI_Send(array, 1, myType, 0, 1, MPI_COMM_WORLD);
+    printf("Freed matrix send\n");
+
     //MPI_Wait(&req, MPI_STATUS_IGNORE);
   }
 
@@ -333,6 +400,7 @@ int main(int argc, char **argv)
   releaseMatrix(A);
   free(rank_row_sizes);
   MPI_Type_free(&row);
+  MPI_Type_free(&myType);
   MPI_Finalize(); //cleanup
 
   // done
@@ -350,13 +418,16 @@ Matrix createMatrix(int N, int M)
   return mat;
 }
 
-void releaseMatrix(Matrix m) { free(m); }
+void releaseMatrix(Matrix m)
+{
+  free(m);
+}
 
 int *getRowSizePerRank(int M, int number_of_ranks)
 {
   int whole_div = (int)M / number_of_ranks;
   int *rows_per_rank;
-  rows_per_rank = (int *)malloc(number_of_ranks * sizeof(int));
+  rows_per_rank = malloc(number_of_ranks * sizeof(int));
 
   for (int loop = number_of_ranks; loop >= 0; loop--)
   {
