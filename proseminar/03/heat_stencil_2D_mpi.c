@@ -3,7 +3,7 @@
 #include <stdbool.h>
 #include <mpi.h>
 #include <unistd.h>
-
+#include <time.h>
 typedef double value_t;
 
 /***
@@ -38,6 +38,9 @@ int main(int argc, char **argv)
   // 'parsing' optional input parameter = problem size
   int N = 100; // columns
   int M = 100; // rows
+
+  clock_t time;
+
   if (argc > 1)
   {
     N = atoi(argv[1]);
@@ -88,6 +91,7 @@ int main(int argc, char **argv)
   if (rank == 0)
   {
     printf("Computing heat-distribution for room size N=%d, M=%d for T=%d timesteps\n", N, M, T);
+    time = clock();
   }
 
   int *rank_row_sizes = getRowSizePerRank(M, number_of_ranks);
@@ -365,6 +369,9 @@ int main(int argc, char **argv)
 
     printf("Verification: %s\n", (success) ? "OK" : "FAILED");
     releaseMatrix(comb, M);
+    time = clock() - time;
+    double time_taken = ((double)time) / CLOCKS_PER_SEC; // in seconds
+    printf("2d MPI heat stencil took %f seconds to execute \n", time_taken);
   }
   else
   {

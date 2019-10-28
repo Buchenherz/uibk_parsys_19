@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 typedef double value_t;
 
@@ -20,8 +21,10 @@ void printTemperature(Matrix m, int N, int M);
 int main(int argc, char **argv)
 {
   // 'parsing' optional input parameter = problem size
-  int N = 300; // columns
-  int M = 100; // rows
+  int N = 200; // columns
+  int M = 200; // rows
+  clock_t time;
+
   if (argc > 1)
   {
     N = atoi(argv[1]);
@@ -29,7 +32,7 @@ int main(int argc, char **argv)
   }
   int T = (N < M ? M : N) * 500;
   printf("Computing heat-distribution for room size N=%d, M=%d for T=%d timesteps\n", N, M, T);
-
+  time = clock();
   // ---------- setup ----------
 
   // create a buffer for storing temperature fields
@@ -127,6 +130,9 @@ int main(int argc, char **argv)
   // ---------- cleanup ----------
 
   releaseMatrix(A);
+  time = clock() - time;
+  double time_taken = ((double)time) / CLOCKS_PER_SEC; // in seconds
+  printf("2d MPI heat stencil took %f seconds to execute \n", time_taken);
 
   // done
   return (success) ? EXIT_SUCCESS : EXIT_FAILURE;
@@ -136,7 +142,7 @@ Matrix createMatrix(int N, int M)
 {
   // create data and index Matrix
   value_t **mat = malloc(sizeof(value_t) * M);
-  for (int i = 0; i < M ; i++)
+  for (int i = 0; i < M; i++)
   {
     mat[i] = malloc(sizeof(value_t) * N);
   }
@@ -156,7 +162,7 @@ void printTemperature(Matrix m, int N, int M)
 
   // set the 'render' resolution
   int W = RESOLUTION;
-  int H = RESOLUTION/4;
+  int H = RESOLUTION / 4;
 
   // step size in each dimension
   int xW = N / W;
