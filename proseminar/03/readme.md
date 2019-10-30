@@ -12,7 +12,7 @@ This exercise consists in extending the heat stencil application of Assignment 2
 - Provide sequential and MPI implementations and run them with multiple problem and machine sizes.
   We provide seqential versions of both 2D and 3D as well as the MPI version of 2D. Comparison with sequential and MPI version can be found within the folder `2d heat stencil`.
 - How can you verify the correctness of your applications?
-We verify our min max temperatures at the end of the program, where the matrix is recollected. 
+  We verify our min max temperatures at the end of the program, where the matrix is recollected. We also compared the sequential and mpi versions and they are the same.
 
 ## Exercise 2
 
