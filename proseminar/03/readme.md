@@ -10,7 +10,9 @@ This exercise consists in extending the heat stencil application of Assignment 2
 
 - Extend the heat stencil application to the two- and three-dimensional cases and name them `heat_stencil_2D` and `heat_stencil_3D`.
 - Provide sequential and MPI implementations and run them with multiple problem and machine sizes.
+  We provide seqential versions of both 2D and 3D as well as the MPI version of 2D. Comparison with sequential and MPI version can be found within the folder `2d heat stencil`.
 - How can you verify the correctness of your applications?
+We verify our min max temperatures at the end of the program, where the matrix is recollected. 
 
 ## Exercise 2
 
@@ -29,4 +31,4 @@ All the material required by the tasks above (e.g. code, figures, etc...) must b
 **Every** member of your group must be able to explain the given problem, your solution, and possible findings. You may also need to answer detailed questions about any of these aspects.
 
 **Please run any benchmarks or heavy CPU loads only on the compute nodes, not on the login node.**
-If you want to do some interactive experimentation, use an *interactive job* as outlined in the tutorial. Make sure to stop any interactive jobs once you are done.
+If you want to do some interactive experimentation, use an _interactive job_ as outlined in the tutorial. Make sure to stop any interactive jobs once you are done.
