@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <stdbool.h>
 
 typedef double value_t;
 
@@ -24,11 +25,16 @@ int main(int argc, char **argv)
   int N = 200; // columns
   int M = 200; // rows
   clock_t time;
+  bool print = true;
 
   if (argc > 1)
   {
     N = atoi(argv[1]);
     M = atoi(argv[2]);
+    if (argc > 3)
+    {
+      print = false;
+    }
   }
   int T = (N < M ? M : N) * 500;
   printf("Computing heat-distribution for room size N=%d, M=%d for T=%d timesteps\n", N, M, T);
@@ -52,9 +58,12 @@ int main(int argc, char **argv)
   int source_y = M / 8;
   A[source_y][source_x] = 273 + 60;
 
-  printf("Initial:\t");
-  printTemperature(A, N, M);
-  printf("\n");
+  if (print)
+  {
+    printf("Initial:\t");
+    printTemperature(A, N, M);
+    printf("\n");
+  }
 
   // ---------- compute ----------
 
@@ -96,7 +105,7 @@ int main(int argc, char **argv)
     B = H;
 
     // show intermediate step
-    if (!(t % 1000))
+    if (!(t % 1000) && print)
     {
       printf("Step t=%d:\n", t);
       printTemperature(A, N, M);
@@ -107,10 +116,12 @@ int main(int argc, char **argv)
   releaseMatrix(B);
 
   // ---------- check ----------
-
-  printf("Final:\n");
-  printTemperature(A, N, M);
-  printf("\n");
+  if (print)
+  {
+    printf("Final:\n");
+    printTemperature(A, N, M);
+    printf("\n");
+  }
 
   int success = 1;
   for (long long i = 0; i < M; i++)

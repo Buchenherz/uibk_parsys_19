@@ -40,11 +40,15 @@ int main(int argc, char **argv)
   int M = 100; // rows
 
   clock_t time;
-
+  bool print = true;
   if (argc > 1)
   {
     N = atoi(argv[1]);
     M = atoi(argv[2]);
+    if (argc > 3)
+    {
+      print = false;
+    }
   }
   int T = (N < M ? M : N) * 500;
 
@@ -82,23 +86,25 @@ int main(int argc, char **argv)
 
   MPI_Cart_shift(comm_cart, 1, 1, &upper_rank, &lower_rank);
 
-  printf("rank %d, %d, %d\n", rank, upper_rank, lower_rank);
-
+  // printf("rank %d, %d, %d\n", rank, upper_rank, lower_rank);
   printf("Rank %d of %d online\n", rank, number_of_ranks - 1);
 
   // endregion
+  int *rank_row_sizes = getRowSizePerRank(M, number_of_ranks);
 
   if (rank == 0)
   {
     printf("Computing heat-distribution for room size N=%d, M=%d for T=%d timesteps\n", N, M, T);
     time = clock();
-  }
-
-  int *rank_row_sizes = getRowSizePerRank(M, number_of_ranks);
-
-  for (size_t i = 0; i < number_of_ranks; i++)
-  {
-    printf("%d ", rank_row_sizes[i]);
+    if (print)
+    {
+      printf("Distribution: ");
+      for (size_t i = 0; i < number_of_ranks; i++)
+      {
+        printf("%d ", rank_row_sizes[i]);
+      }
+      printf("\n");
+    }
   }
 
   // ---------- setup ----------
@@ -120,9 +126,12 @@ int main(int argc, char **argv)
   int source_y = M / 8;
   A[source_y][source_x] = 273 + 60;
 
-  // printf("Initial:\t");
-  // printTemperature(A, N, M);
-  // printf("\n");
+  if (print)
+  {
+    printf("Initial:\t");
+    printTemperature(A, N, M);
+    printf("\n");
+  }
 
   // ---------- compute ----------
 
@@ -152,8 +161,12 @@ int main(int argc, char **argv)
   int local_first_row_index = local_m_start;
   int local_last_row_index = local_m_end - 1;
 
-  printf("LFRI %d, LLRI %d\n", local_first_row_index, local_last_row_index);
-  printf("LMS %d, LME %d\n", local_m_start, local_m_end);
+  if (print)
+  {
+    printf("LFRI %d, LLRI %d\n", local_first_row_index, local_last_row_index);
+    printf("LMS %d, LME %d\n", local_m_start, local_m_end);
+  }
+
   // for each time step ..
   for (int t = 0; t < T; t++)
   {
@@ -170,11 +183,6 @@ int main(int argc, char **argv)
 
       /* Received the last local row from the lower rank, appending it as the new last local row */
       A[local_last_row_index + 1] = received_lower_row;
-      // for (int index = 0; index < N; index++)
-      // {
-      //   printf("Recv: %f, ", received_lower_row[index]);
-      // }
-      // printf("\n");
     }
     else if (lower_rank < 0)
     {
@@ -184,12 +192,6 @@ int main(int argc, char **argv)
 
       /* Received the first local row from the upper rank, appending it as the new last local row */
       A[local_first_row_index - 1] = received_upper_row;
-
-      // for (int index = 0; index < N; index++)
-      // {
-      //   printf("Recv: %f, ", received_upper_row[index]);
-      // }
-      // printf("\n");
     }
     else
     {
@@ -201,16 +203,6 @@ int main(int argc, char **argv)
       MPI_Recv(received_lower_row, 1, row, lower_rank, 0, comm_cart, MPI_STATUS_IGNORE);
       A[local_first_row_index - 1] = received_upper_row;
       A[local_last_row_index + 1] = received_lower_row;
-      // for (int index = 0; index < N; index++)
-      // {
-      //   printf("Recv: %f, ", received_upper_row[index]);
-      // }
-      // printf("\n");
-      // for (int index = 0; index < N; index++)
-      // {
-      //   printf("Recv: %f, ", received_lower_row[index]);
-      // }
-      // printf("\n");
     }
 
     // .. we propagate the temperature
@@ -246,7 +238,7 @@ int main(int argc, char **argv)
     B = H;
 
     // show intermediate step
-    if (!(t % 1000))
+    if (!(t % 1000) && print)
     {
       if (rank == 0)
       {
@@ -348,23 +340,25 @@ int main(int argc, char **argv)
       }
     }
 
-    printf("Final\n");
-    printTemperature(comb, N, M);
-    printf("\n");
+    if (print)
+    {
+      printf("Final\n");
+      printTemperature(comb, N, M);
+      printf("\n");
+    }
 
     for (long long i = 0; i < M; i++)
     {
       for (long long j = 0; j < N; j++)
       {
         value_t temp = comb[i][j];
-        // printf("%f ", temp);
+
         if (273 <= temp && temp <= 273 + 60)
           continue;
         success = 0;
-        // printf("temp: %f, i: %lld, j: %lld \n", temp, i, j);
+
         break;
       }
-      // printf("\n");
     }
 
     printf("Verification: %s\n", (success) ? "OK" : "FAILED");
@@ -375,21 +369,15 @@ int main(int argc, char **argv)
   }
   else
   {
-
     value_t array[M][N];
     for (size_t i = 0; i < M; i++)
     {
       for (size_t k = 0; k < N; k++)
       {
         array[i][k] = A[i][k];
-        // printf("%f ", A[i][k]);
       }
-      // printf("\n");
     }
-
     MPI_Send(array, 1, myType, 0, 1, MPI_COMM_WORLD);
-
-    //MPI_Wait(&req, MPI_STATUS_IGNORE);
   }
 
   // ---------- cleanup ----------
