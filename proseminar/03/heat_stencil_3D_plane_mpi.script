@@ -12,10 +12,10 @@
 
 # Name the job. Unless you use the -o and -e options, output will
 # go to a unique file name.ojob_id for each job.
-#$ -N heat_stencil_3D_mpi
+#$ -N heat_stencil_3D_plane_mpi
 
 # Redirect output stream to this file. Useful for debugging, simple output, etc.
-#$ -o heat_stencil_3D_mpi.out
+#$ -o heat_stencil_3D_plane_mpi.out
 
 # Redirect error stream to this file.
 #$ -e error.dat
@@ -38,7 +38,7 @@
 module load openmpi/4.0.1
 module load gcc
 
-mpicc -O2 -std=c99 -Wall -Wextra -pedantic heat_stencil_3D_mpi.c -o heat_stencil_3D_mpi.o -lm
+mpicc -O2 -std=c99 -Wall -Wextra -pedantic heat_stencil_3D_plane_mpi.c -o heat_stencil_3D_plane_mpi.o -lm
 
 # Execute the software on 2 slots
-mpiexec -n 4 ./heat_stencil_3D_mpi.o 100 100 100
+mpiexec -n 4 ./heat_stencil_3D_plane_mpi.o 100 100 100

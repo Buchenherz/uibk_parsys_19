@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <mpi.h>
 #include <stdbool.h>
+#include <time.h>
 
 typedef double value_t;
 
@@ -11,6 +12,8 @@ typedef double value_t;
 
 typedef value_t **Matrix;
 typedef value_t ***Room;
+
+clock_t walltime;
 
 Matrix createMatrix(int N, int M);
 Room createRoom(int N, int M, int H);
@@ -78,6 +81,7 @@ int main(int argc, char **argv)
 
   if (rank == 0)
   {
+    walltime = clock();
     printf("Computing heat-distribution for room size N=%d, M=%d for T=%d timesteps\n", Nx, Ny, T);
   }
 
@@ -323,7 +327,7 @@ int main(int argc, char **argv)
         for (long k = 0; k < Nx; k++)
         {
           value_t temp = A[i][j][k];
-          printf("%lf ", A[i][j][k]);
+          // printf("%lf ", A[i][j][k]);
           if (273 <= temp && temp <= 273 + 60)
             continue;
           success = 0;
@@ -331,6 +335,9 @@ int main(int argc, char **argv)
         }
       }
     }
+    walltime = clock() - walltime;
+    double time_taken = ((double)walltime) / CLOCKS_PER_SEC; // in seconds
+    printf("3d plane MPI heat stencil took %f seconds to execute \n", time_taken);
 
     printf("Verification: %s\n", (success) ? "OK" : "FAILED");
 
