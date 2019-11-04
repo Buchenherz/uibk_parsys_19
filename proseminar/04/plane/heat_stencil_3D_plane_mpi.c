@@ -82,10 +82,10 @@ int main(int argc, char **argv)
   if (rank == 0)
   {
     walltime = clock();
-    printf("Computing heat-distribution for room size N=%d, M=%d for T=%d timesteps\n", Nx, Ny, T);
+    printf("Computing heat-distribution for room size Nx=%d, Ny=%d, Nz=%d for T=%d timesteps\n", Nx, Ny, Nz, T);
   }
 
-  int *rank_plane_sizes = getPlaneSizePerRank(Ny, number_of_ranks);
+  int *rank_plane_sizes = getPlaneSizePerRank(Nx, number_of_ranks);
 
   for (int i = 0; i < number_of_ranks; i++)
   {
@@ -154,24 +154,23 @@ int main(int argc, char **argv)
   {
     // send / receive planes here
     // planes that will be added on top / below local planes
-    Matrix received_upper_plane = createMatrix(Nx, Nz);
-    Matrix received_lower_plane = createMatrix(Nx, Nz);
+    Matrix received_upper_plane = createMatrix(Nz, Ny);
+    Matrix received_lower_plane = createMatrix(Nz, Ny);
 
     if (upper_rank < 0)
     {
       /* Upper rank does not exist, only receive one from below and send one to below */
-      MPI_Send(&(A[local_last_plane_index][0][0]), Nx * Nz, MPI_DOUBLE, lower_rank, 0, comm_cart);
-      MPI_Recv(&(received_lower_plane[0][0]), Nx * Nz, MPI_DOUBLE, lower_rank, 0, comm_cart, MPI_STATUS_IGNORE);
+      MPI_Send(&(A[local_last_plane_index][0][0]), Nz * Ny, MPI_DOUBLE, lower_rank, 0, comm_cart);
+      MPI_Recv(&(received_lower_plane[0][0]), Nz * Ny, MPI_DOUBLE, lower_rank, 0, comm_cart, MPI_STATUS_IGNORE);
 
       /* Received the last local plane from the lower rank, appending it as the new last local plane */
       A[local_last_plane_index + 1] = received_lower_plane;
     }
     else if (lower_rank < 0)
     {
-
       /* Lower rank does not exist, only receive one from above and send one to above */
-      MPI_Recv(&(received_upper_plane[0][0]), Nx * Nz, MPI_DOUBLE, upper_rank, 0, comm_cart, MPI_STATUS_IGNORE);
-      MPI_Send(&(A[local_first_plane_index][0][0]), Nx * Nz, MPI_DOUBLE, upper_rank, 0, comm_cart);
+      MPI_Recv(&(received_upper_plane[0][0]), Nz * Ny, MPI_DOUBLE, upper_rank, 0, comm_cart, MPI_STATUS_IGNORE);
+      MPI_Send(&(A[local_first_plane_index][0][0]), Nz * Ny, MPI_DOUBLE, upper_rank, 0, comm_cart);
 
       /* Received the first local plane from the upper rank, appending it as the new last local plane */
       A[local_first_plane_index - 1] = received_upper_plane;
@@ -180,10 +179,10 @@ int main(int argc, char **argv)
     {
       MPI_Request request;
       /* Upper and lower ranks exist, send and receive both */
-      MPI_Isend(A[local_first_plane_index], Nx * Nz, MPI_DOUBLE, upper_rank, 0, comm_cart, &request);
-      MPI_Isend(A[local_last_plane_index], Nx * Nz, MPI_DOUBLE, lower_rank, 0, comm_cart, &request);
-      MPI_Recv(&(received_upper_plane[0][0]), Nx * Nz, MPI_DOUBLE, upper_rank, 0, comm_cart, MPI_STATUS_IGNORE);
-      MPI_Recv(&(received_lower_plane[0][0]), Nx * Nz, MPI_DOUBLE, lower_rank, 0, comm_cart, MPI_STATUS_IGNORE);
+      MPI_Isend(&(A[local_first_plane_index][0][0]), Nz * Ny, MPI_DOUBLE, upper_rank, 0, comm_cart, &request);
+      MPI_Isend(&(A[local_last_plane_index][0][0]), Nz * Ny, MPI_DOUBLE, lower_rank, 0, comm_cart, &request);
+      MPI_Recv(&(received_upper_plane[0][0]), Nz * Ny, MPI_DOUBLE, upper_rank, 0, comm_cart, MPI_STATUS_IGNORE);
+      MPI_Recv(&(received_lower_plane[0][0]), Nz * Ny, MPI_DOUBLE, lower_rank, 0, comm_cart, MPI_STATUS_IGNORE);
       A[local_first_plane_index - 1] = received_upper_plane;
       A[local_last_plane_index + 1] = received_lower_plane;
     }
@@ -253,15 +252,11 @@ int main(int argc, char **argv)
           // printf("omstart %d, omend %d\n", o_m_start, o_m_end);
           for (int k = o_m_start; k < o_m_end; k++)
           {
-            for (size_t g = 0; g < Ny; g++)
-            {
-              //printf("r: %f ", recv[k][g]);
-              comb[k][g] = recv[k][g];
-              /* code */
-            }
+            comb[k] = recv[k];
             // printf("\n");
           }
         }
+
         printTemperature(comb, Nx, Ny, Nz);
         releaseRoom(comb);
       }
@@ -290,9 +285,9 @@ int main(int argc, char **argv)
     for (int orank = 1; orank < number_of_ranks; orank++)
     {
       // printf("\n");
-      Matrix recv = createMatrix(Nx, Nz);
+      Room recv = createRoom(Nx, Ny, Nz);
       // printf("\nRecv array %d\n", orank);
-      MPI_Recv(&(recv[0][0]), 1, subarrayType, orank, 1, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+      MPI_Recv(&(recv[0][0][0]), Nx * Ny * Nz, MPI_DOUBLE, orank, 1, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
       int sum = 0;
       for (int j = 0; j < orank; j++)
@@ -301,35 +296,31 @@ int main(int argc, char **argv)
       }
       int o_m_start = sum;
       int o_m_end = sum + rank_plane_sizes[orank];
-      // printf("omstart %d, omend %d\n", o_m_start, o_m_end);
+      printf("omstart %d, omend %d\n", o_m_start, o_m_end);
       for (int k = o_m_start; k < o_m_end; k++)
       {
-        for (size_t g = 0; g < Ny; g++)
-        {
-          //printf("r: %f ", recv[k][g]);
-          comb[k][g] = &recv[k][g];
-          /* code */
-        }
+        comb[k] = recv[k];
         // printf("\n");
       }
     }
 
-    A[0][0][0] = comb[0][0][0];
+    A = comb;
 
     printf("Final:\n");
-    printTemperature(A, Nx, Ny, Nz);
+    printTemperature(comb, Nx, Ny, Nz);
     printf("\n");
 
-    for (long i = 0; i < Nz; i++)
+    for (long i = 0; i < Nx; i++)
     {
       for (long j = 0; j < Ny; j++)
       {
-        for (long k = 0; k < Nx; k++)
+        for (long k = 0; k < Nz; k++)
         {
-          value_t temp = A[i][j][k];
+          value_t temp = comb[i][j][k];
           // printf("%lf ", A[i][j][k]);
           if (273 <= temp && temp <= 273 + 60)
             continue;
+          // printf("[%ld,%ld,%ld]", i, j, k);
           success = 0;
           break;
         }
@@ -347,7 +338,7 @@ int main(int argc, char **argv)
   {
     // printf("\nSend array %d\n", rank);
     //MPI_Request req;
-    MPI_Send(&(A[0][0][0]), Nx * Nz, MPI_DOUBLE, 0, 1, MPI_COMM_WORLD);
+    MPI_Send(&(A[0][0][0]), Nx * Ny * Nz, MPI_DOUBLE, 0, 1, MPI_COMM_WORLD);
   }
 
   // ---------- cleanup ----------

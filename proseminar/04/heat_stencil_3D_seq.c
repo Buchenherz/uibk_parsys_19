@@ -1,7 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
+#include <time.h>
 
 typedef double value_t;
+
+clock_t walltime;
 
 #define RESOLUTION 60
 
@@ -33,6 +37,7 @@ int main(int argc, char **argv)
   }
   int max = (N < M ? M : N);
   int T = (max < H ? H : max) * 500;
+  walltime = clock();
   printf("Computing heat-distribution for room size N=%d, M=%d for T=%d timesteps\n", N, M, T);
 
   // ---------- setup ----------
@@ -94,10 +99,10 @@ int main(int argc, char **argv)
           value_t tu = (j != 0) ? A[i][j - 1][k] : tc;      // up
           value_t td = (j != M - 1) ? A[i][j + 1][k] : tc;  // down
           value_t th = (i != 0) ? A[i - 1][j][k] : tc;      // higher
-          value_t tlo = (i != H - 1) ? A[i + 1][j][k] : tc;  // lower
+          value_t tlo = (i != H - 1) ? A[i + 1][j][k] : tc; // lower
 
           // compute new temperature at current position
-          B[i][j][k] = tc + 0.1 * (tl + tr + tu + td +  th +  tlo + (-6 * tc));
+          B[i][j][k] = tc + 0.1 * (tl + tr + tu + td + th + tlo + (-6 * tc));
         }
       }
     }
@@ -108,7 +113,7 @@ int main(int argc, char **argv)
     B = Help;
 
     // show intermediate step
-    if (!(t % 1000))
+    if (!(t % 1000) && false)
     {
       printf("Step t=%d:\n", t);
       // saveTemperature(A, N, M);
@@ -134,15 +139,20 @@ int main(int argc, char **argv)
       for (long k = 0; k < N; k++)
       {
         value_t temp = A[i][j][k];
+        // printf("%lf ", A[i][j][k]);
+
         if (273 <= temp && temp <= 273 + 60)
           continue;
         success = 0;
-        printf("[%ld,%ld,%ld]",i,j,k);
+        printf("[%ld,%ld,%ld]", i, j, k);
         break;
       }
     }
   }
 
+  walltime = clock() - walltime;
+  double time_taken = ((double)walltime) / CLOCKS_PER_SEC; // in seconds
+  printf("3d seq heat stencil took %f seconds to execute \n", time_taken);
   printf("Verification: %s\n", (success) ? "OK" : "FAILED");
 
   // ---------- cleanup ----------
@@ -157,10 +167,10 @@ Matrix createMatrix(int N, int M, int H)
 {
   // create data and index Matrix
   value_t ***mat = malloc(sizeof(value_t) * H);
-  for (int i = 0; i < H ; i++)
+  for (int i = 0; i < H; i++)
   {
     mat[i] = malloc(sizeof(value_t) * M);
-    for (int j = 0; j < M ; j++)
+    for (int j = 0; j < M; j++)
     {
       mat[i][j] = malloc(sizeof(value_t) * N);
     }
@@ -170,7 +180,8 @@ Matrix createMatrix(int N, int M, int H)
 
 void releaseMatrix(Matrix m) { free(m); }
 
-void saveTemperature(Matrix m, int N, int M, int H) {
+void saveTemperature(Matrix m, int N, int M, int H)
+{
 }
 
 void printTemperature(Matrix m, int N, int M, int H)
@@ -184,8 +195,8 @@ void printTemperature(Matrix m, int N, int M, int H)
 
   // set the 'render' resolution
   int Xres = RESOLUTION;
-  int Yres = RESOLUTION/4;
-  int Zres = RESOLUTION/20;
+  int Yres = RESOLUTION / 4;
+  int Zres = RESOLUTION / 20;
   // printf("Resolution = %d x %d x %d\n",Xres,Yres,Zres);
   // step size in each dimension
   int xW = N / Xres;
@@ -198,7 +209,7 @@ void printTemperature(Matrix m, int N, int M, int H)
     // top wall
     for (int j = 0; j < Xres; j++)
     {
-      if (j == 0 || j == Xres-1)
+      if (j == 0 || j == Xres - 1)
         printf("+");
       else
         printf("-");
@@ -238,7 +249,7 @@ void printTemperature(Matrix m, int N, int M, int H)
     // bottom wall
     for (int j = 0; j < Xres; j++)
     {
-      if (j == 0 || j == Xres-1)
+      if (j == 0 || j == Xres - 1)
         printf("+");
       else
         printf("-");
