@@ -25,7 +25,9 @@
 
 # Specifies the parallel environment. A list is available with qconf -spl. In this case
 # 2 slots per node, with 2 slots in total
-#$ -pe openmpi-1perhost 1
+#$ -pe openmpi-4perhost 4
+#$ -l exclusive=true
+
 
 # check whether the syntax of the job is okay (do not submit the job)
 # #$ -w v
@@ -39,4 +41,4 @@ module load gcc
 mpicc -O2 -std=c99 -Wall -Wextra -pedantic heat_stencil_3D_mpi.c -o heat_stencil_3D_mpi.o -lm
 
 # Execute the software on 2 slots
-mpiexec -n 1 ./heat_stencil_3D_mpi.o
+mpiexec -n 4 ./heat_stencil_3D_mpi.o 100 100 100
