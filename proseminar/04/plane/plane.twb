@@ -1,0 +1,868 @@
+<?xml version='1.0' encoding='utf-8' ?>
+
+<!-- build 20192.19.1017.1638                               -->
+<workbook original-version='18.1' source-build='2019.2.5 (20192.19.1017.1638)' source-platform='mac' version='18.1' xmlns:user='http://www.tableausoftware.com/xml/user'>
+  <document-format-change-manifest>
+    <SheetIdentifierTracking ignorable='true' predowngraded='true' />
+    <WindowsPersistSimpleIdentifiers />
+  </document-format-change-manifest>
+  <preferences>
+    <preference name='ui.encoding.shelf.height' value='24' />
+    <preference name='ui.shelf.height' value='26' />
+  </preferences>
+  <datasources>
+    <datasource caption='heat_stencil_3d_mpi_times_4sys.csv+ (Multiple Connections)' inline='true' name='federated.18vlg2l1tzhry21ezrlc10wijj8f' version='18.1'>
+      <connection class='federated'>
+        <named-connections>
+          <named-connection caption='heat_stencil_3d_mpi_times_4sys' name='textscan.1jetp4y1bg2y5n12lybqf0j5vfdb'>
+            <connection class='textscan' directory='/Users/clemenspfister/Documents/GitRepos/uibk_parsys_19/proseminar/04/plane' filename='heat_stencil_3d_mpi_times_4sys.csv' password='' server='' />
+          </named-connection>
+          <named-connection caption='heat_stencil_3d_mpi_times_2sys' name='textscan.0sfgg4q0hx0vy3170tp870h64484'>
+            <connection class='textscan' directory='/Users/clemenspfister/Documents/GitRepos/uibk_parsys_19/proseminar/04/plane' filename='heat_stencil_3d_mpi_times_2sys.csv' password='' server='' />
+          </named-connection>
+          <named-connection caption='seq_times' name='textscan.1s5bom619abfcp1d9fske18221bb'>
+            <connection class='textscan' directory='/Users/clemenspfister/Documents/GitRepos/uibk_parsys_19/proseminar/04' filename='seq_times.csv' password='' server='' />
+          </named-connection>
+        </named-connections>
+        <relation join='inner' type='join'>
+          <clause type='join'>
+            <expression op='='>
+              <expression op='[heat_stencil_3d_mpi_times_4sys.csv].[problemsize]' />
+              <expression op='[seq_times.csv].[problemsize]' />
+            </expression>
+          </clause>
+          <relation join='full' type='join'>
+            <clause type='join'>
+              <expression op='='>
+                <expression op='[heat_stencil_3d_mpi_times_4sys.csv].[problemsize]' />
+                <expression op='[heat_stencil_3d_mpi_times_2sys.csv].[problemsize]' />
+              </expression>
+            </clause>
+            <relation connection='textscan.1jetp4y1bg2y5n12lybqf0j5vfdb' name='heat_stencil_3d_mpi_times_4sys.csv' table='[heat_stencil_3d_mpi_times_4sys#csv]' type='table'>
+              <columns character-set='UTF-8' header='yes' locale='en' separator=','>
+                <column datatype='string' name='problemsize' ordinal='0' />
+                <column datatype='real' name='time' ordinal='1' />
+              </columns>
+            </relation>
+            <relation connection='textscan.0sfgg4q0hx0vy3170tp870h64484' name='heat_stencil_3d_mpi_times_2sys.csv' table='[heat_stencil_3d_mpi_times_2sys#csv]' type='table'>
+              <columns character-set='UTF-8' header='yes' locale='en' separator=','>
+                <column datatype='string' name='problemsize' ordinal='0' />
+                <column datatype='real' name='time' ordinal='1' />
+              </columns>
+            </relation>
+          </relation>
+          <relation connection='textscan.1s5bom619abfcp1d9fske18221bb' name='seq_times.csv' table='[seq_times#csv]' type='table'>
+            <columns character-set='UTF-8' header='yes' locale='en' separator=','>
+              <column datatype='string' name='problemsize' ordinal='0' />
+              <column datatype='real' name='time' ordinal='1' />
+            </columns>
+          </relation>
+        </relation>
+        <cols>
+          <map key='[problemsize (heat_stencil_3d_mpi_times_2sys.csv)]' value='[heat_stencil_3d_mpi_times_2sys.csv].[problemsize]' />
+          <map key='[problemsize (seq_times.csv)]' value='[seq_times.csv].[problemsize]' />
+          <map key='[problemsize]' value='[heat_stencil_3d_mpi_times_4sys.csv].[problemsize]' />
+          <map key='[time (heat_stencil_3d_mpi_times_2sys.csv)]' value='[heat_stencil_3d_mpi_times_2sys.csv].[time]' />
+          <map key='[time (seq_times.csv)]' value='[seq_times.csv].[time]' />
+          <map key='[time]' value='[heat_stencil_3d_mpi_times_4sys.csv].[time]' />
+        </cols>
+        <metadata-records>
+          <metadata-record class='capability'>
+            <remote-name />
+            <remote-type>0</remote-type>
+            <parent-name>[heat_stencil_3d_mpi_times_4sys.csv]</parent-name>
+            <remote-alias />
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='string' name='character-set'>&quot;UTF-8&quot;</attribute>
+              <attribute datatype='string' name='collation'>&quot;en_GB&quot;</attribute>
+              <attribute datatype='string' name='currency'>&quot;¤&quot;</attribute>
+              <attribute datatype='string' name='field-delimiter'>&quot;,&quot;</attribute>
+              <attribute datatype='string' name='header-row'>&quot;true&quot;</attribute>
+              <attribute datatype='string' name='locale'>&quot;en&quot;</attribute>
+              <attribute datatype='string' name='single-char'>&quot;&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>problemsize</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[problemsize]</local-name>
+            <parent-name>[heat_stencil_3d_mpi_times_4sys.csv]</parent-name>
+            <remote-alias>problemsize</remote-alias>
+            <ordinal>0</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <scale>1</scale>
+            <width>1073741823</width>
+            <contains-null>true</contains-null>
+            <collation flag='0' name='LEN_RGB' />
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>time</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[time]</local-name>
+            <parent-name>[heat_stencil_3d_mpi_times_4sys.csv]</parent-name>
+            <remote-alias>time</remote-alias>
+            <ordinal>1</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='capability'>
+            <remote-name />
+            <remote-type>0</remote-type>
+            <parent-name>[heat_stencil_3d_mpi_times_2sys.csv]</parent-name>
+            <remote-alias />
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='string' name='character-set'>&quot;UTF-8&quot;</attribute>
+              <attribute datatype='string' name='collation'>&quot;en_GB&quot;</attribute>
+              <attribute datatype='string' name='currency'>&quot;¤&quot;</attribute>
+              <attribute datatype='string' name='field-delimiter'>&quot;,&quot;</attribute>
+              <attribute datatype='string' name='header-row'>&quot;true&quot;</attribute>
+              <attribute datatype='string' name='locale'>&quot;en&quot;</attribute>
+              <attribute datatype='string' name='single-char'>&quot;&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>problemsize</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[problemsize (heat_stencil_3d_mpi_times_2sys.csv)]</local-name>
+            <parent-name>[heat_stencil_3d_mpi_times_2sys.csv]</parent-name>
+            <remote-alias>problemsize</remote-alias>
+            <ordinal>2</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <scale>1</scale>
+            <width>1073741823</width>
+            <contains-null>true</contains-null>
+            <collation flag='0' name='LEN_RGB' />
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>time</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[time (heat_stencil_3d_mpi_times_2sys.csv)]</local-name>
+            <parent-name>[heat_stencil_3d_mpi_times_2sys.csv]</parent-name>
+            <remote-alias>time</remote-alias>
+            <ordinal>3</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='capability'>
+            <remote-name />
+            <remote-type>0</remote-type>
+            <parent-name>[seq_times.csv]</parent-name>
+            <remote-alias />
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='string' name='character-set'>&quot;UTF-8&quot;</attribute>
+              <attribute datatype='string' name='collation'>&quot;en_GB&quot;</attribute>
+              <attribute datatype='string' name='currency'>&quot;¤&quot;</attribute>
+              <attribute datatype='string' name='field-delimiter'>&quot;,&quot;</attribute>
+              <attribute datatype='string' name='header-row'>&quot;true&quot;</attribute>
+              <attribute datatype='string' name='locale'>&quot;en&quot;</attribute>
+              <attribute datatype='string' name='single-char'>&quot;&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>problemsize</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[problemsize (seq_times.csv)]</local-name>
+            <parent-name>[seq_times.csv]</parent-name>
+            <remote-alias>problemsize</remote-alias>
+            <ordinal>4</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <scale>1</scale>
+            <width>1073741823</width>
+            <contains-null>true</contains-null>
+            <collation flag='0' name='LEN_RGB' />
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>time</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[time (seq_times.csv)]</local-name>
+            <parent-name>[seq_times.csv]</parent-name>
+            <remote-alias>time</remote-alias>
+            <ordinal>5</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+          </metadata-record>
+        </metadata-records>
+      </connection>
+      <aliases enabled='yes' />
+      <column datatype='integer' name='[Number of Records]' role='measure' type='quantitative' user:auto-column='numrec'>
+        <calculation class='tableau' formula='1' />
+      </column>
+      <column aggregation='CountD' caption='Problemsize (Heat Stencil 3D Mpi Times 2Sys.Csv)' datatype='string' name='[problemsize (heat_stencil_3d_mpi_times_2sys.csv)]' role='dimension' type='nominal' />
+      <column caption='Problemsize (Seq Times.Csv)' datatype='string' hidden='true' name='[problemsize (seq_times.csv)]' role='dimension' type='nominal' />
+      <column caption='Problemsize' datatype='string' hidden='true' name='[problemsize]' role='dimension' type='nominal' />
+      <column caption='Time 2 Systems' datatype='real' name='[time (heat_stencil_3d_mpi_times_2sys.csv)]' role='measure' type='quantitative' />
+      <column caption='Time sequential' datatype='real' name='[time (seq_times.csv)]' role='measure' type='quantitative' />
+      <column caption='Time 4 Systems' datatype='real' name='[time]' role='measure' type='quantitative' />
+      <column-instance column='[time (heat_stencil_3d_mpi_times_2sys.csv)]' derivation='Sum' name='[sum:time (heat_stencil_3d_mpi_times_2sys.csv):qk]' pivot='key' type='quantitative' />
+      <column-instance column='[time (seq_times.csv)]' derivation='Sum' name='[sum:time (seq_times.csv):qk]' pivot='key' type='quantitative' />
+      <column-instance column='[time]' derivation='Sum' name='[sum:time:qk]' pivot='key' type='quantitative' />
+      <layout dim-ordering='alphabetic' dim-percentage='0.56438' measure-ordering='alphabetic' measure-percentage='0.43562' show-structure='true' />
+      <style>
+        <style-rule element='mark'>
+          <encoding attr='color' field='[:Measure Names]' type='palette'>
+            <map to='#4e79a7'>
+              <bucket>&quot;[federated.18vlg2l1tzhry21ezrlc10wijj8f].[sum:time (heat_stencil_3d_mpi_times_2sys.csv):qk]&quot;</bucket>
+            </map>
+            <map to='#e15759'>
+              <bucket>&quot;[federated.18vlg2l1tzhry21ezrlc10wijj8f].[sum:time (seq_times.csv):qk]&quot;</bucket>
+            </map>
+            <map to='#f28e2b'>
+              <bucket>&quot;[federated.18vlg2l1tzhry21ezrlc10wijj8f].[sum:time:qk]&quot;</bucket>
+            </map>
+          </encoding>
+        </style-rule>
+      </style>
+      <date-options start-of-week='monday' />
+    </datasource>
+  </datasources>
+  <worksheets>
+    <worksheet name='Planes Comparison'>
+      <layout-options export-legend-location='bottom' export-no-caption='true' export-orientation='landscape' />
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='heat_stencil_3d_mpi_times_4sys.csv+ (Multiple Connections)' name='federated.18vlg2l1tzhry21ezrlc10wijj8f' />
+          </datasources>
+          <datasource-dependencies datasource='federated.18vlg2l1tzhry21ezrlc10wijj8f'>
+            <column-instance column='[problemsize (heat_stencil_3d_mpi_times_2sys.csv)]' derivation='None' name='[none:problemsize (heat_stencil_3d_mpi_times_2sys.csv):nk]' pivot='key' type='nominal' />
+            <column-instance column='[time (heat_stencil_3d_mpi_times_2sys.csv)]' derivation='None' name='[none:time (heat_stencil_3d_mpi_times_2sys.csv):ok]' pivot='key' type='ordinal' />
+            <column aggregation='CountD' caption='Problemsize (Heat Stencil 3D Mpi Times 2Sys.Csv)' datatype='string' name='[problemsize (heat_stencil_3d_mpi_times_2sys.csv)]' role='dimension' type='nominal' />
+            <column-instance column='[time (heat_stencil_3d_mpi_times_2sys.csv)]' derivation='Sum' name='[sum:time (heat_stencil_3d_mpi_times_2sys.csv):qk]' pivot='key' type='quantitative' />
+            <column-instance column='[time (seq_times.csv)]' derivation='Sum' name='[sum:time (seq_times.csv):qk]' pivot='key' type='quantitative' />
+            <column-instance column='[time]' derivation='Sum' name='[sum:time:qk]' pivot='key' type='quantitative' />
+            <column caption='Time 2 Systems' datatype='real' name='[time (heat_stencil_3d_mpi_times_2sys.csv)]' role='measure' type='quantitative' />
+            <column caption='Time sequential' datatype='real' name='[time (seq_times.csv)]' role='measure' type='quantitative' />
+            <column caption='Time 4 Systems' datatype='real' name='[time]' role='measure' type='quantitative' />
+          </datasource-dependencies>
+          <filter class='categorical' column='[federated.18vlg2l1tzhry21ezrlc10wijj8f].[:Measure Names]'>
+            <groupfilter function='union' user:op='manual'>
+              <groupfilter function='member' level='[:Measure Names]' member='&quot;[federated.18vlg2l1tzhry21ezrlc10wijj8f].[sum:time (seq_times.csv):qk]&quot;' />
+              <groupfilter function='member' level='[:Measure Names]' member='&quot;[federated.18vlg2l1tzhry21ezrlc10wijj8f].[sum:time (heat_stencil_3d_mpi_times_2sys.csv):qk]&quot;' />
+              <groupfilter function='member' level='[:Measure Names]' member='&quot;[federated.18vlg2l1tzhry21ezrlc10wijj8f].[sum:time:qk]&quot;' />
+            </groupfilter>
+          </filter>
+          <filter class='categorical' column='[federated.18vlg2l1tzhry21ezrlc10wijj8f].[none:time (heat_stencil_3d_mpi_times_2sys.csv):ok]'>
+            <groupfilter function='except' user:ui-domain='relevant' user:ui-enumeration='exclusive' user:ui-marker='enumerate'>
+              <groupfilter function='level-members' level='[none:time (heat_stencil_3d_mpi_times_2sys.csv):ok]' />
+              <groupfilter function='member' level='[none:time (heat_stencil_3d_mpi_times_2sys.csv):ok]' member='%null%' />
+            </groupfilter>
+          </filter>
+          <slices>
+            <column>[federated.18vlg2l1tzhry21ezrlc10wijj8f].[none:time (heat_stencil_3d_mpi_times_2sys.csv):ok]</column>
+            <column>[federated.18vlg2l1tzhry21ezrlc10wijj8f].[:Measure Names]</column>
+          </slices>
+          <aggregation value='true' />
+        </view>
+        <style>
+          <style-rule element='axis'>
+            <format attr='title' class='0' field='[federated.18vlg2l1tzhry21ezrlc10wijj8f].[Multiple Values]' scope='rows' value='Amount of seconds' />
+          </style-rule>
+          <style-rule element='cell'>
+            <format attr='width' field='[federated.18vlg2l1tzhry21ezrlc10wijj8f].[none:problemsize (heat_stencil_3d_mpi_times_2sys.csv):nk]' value='743' />
+          </style-rule>
+        </style>
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Line' />
+            <encodings>
+              <color column='[federated.18vlg2l1tzhry21ezrlc10wijj8f].[:Measure Names]' />
+            </encodings>
+            <style>
+              <style-rule element='mark'>
+                <format attr='mark-labels-show' value='true' />
+                <format attr='mark-labels-cull' value='true' />
+              </style-rule>
+              <style-rule element='pane'>
+                <format attr='minwidth' value='-1' />
+                <format attr='maxwidth' value='-1' />
+              </style-rule>
+            </style>
+          </pane>
+        </panes>
+        <rows>[federated.18vlg2l1tzhry21ezrlc10wijj8f].[Multiple Values]</rows>
+        <cols>[federated.18vlg2l1tzhry21ezrlc10wijj8f].[none:problemsize (heat_stencil_3d_mpi_times_2sys.csv):nk]</cols>
+        <mark-labels>
+          <mark-label id='0' label-state='on'>
+            <tuple-reference>
+              <tuple-descriptor>
+                <pane-descriptor>
+                  <x-fields>
+                    <field>[federated.18vlg2l1tzhry21ezrlc10wijj8f].[none:problemsize (heat_stencil_3d_mpi_times_2sys.csv):nk]</field>
+                  </x-fields>
+                  <y-fields>
+                    <field>[federated.18vlg2l1tzhry21ezrlc10wijj8f].[Multiple Values]</field>
+                  </y-fields>
+                </pane-descriptor>
+                <columns>
+                  <field>[federated.18vlg2l1tzhry21ezrlc10wijj8f].[none:problemsize (heat_stencil_3d_mpi_times_2sys.csv):nk]</field>
+                  <field>[federated.18vlg2l1tzhry21ezrlc10wijj8f].[:Measure Names]</field>
+                  <field>[federated.18vlg2l1tzhry21ezrlc10wijj8f].[Multiple Values]</field>
+                </columns>
+              </tuple-descriptor>
+              <tuple>
+                <value>&quot;N=M=H=10 for T=5000 timesteps&quot;</value>
+                <value>&quot;[federated.18vlg2l1tzhry21ezrlc10wijj8f].[sum:time (seq_times.csv):qk]&quot;</value>
+                <value>0.16</value>
+              </tuple>
+            </tuple-reference>
+          </mark-label>
+          <mark-label id='1' label-state='on'>
+            <tuple-reference>
+              <tuple-descriptor>
+                <pane-descriptor>
+                  <x-fields>
+                    <field>[federated.18vlg2l1tzhry21ezrlc10wijj8f].[none:problemsize (heat_stencil_3d_mpi_times_2sys.csv):nk]</field>
+                  </x-fields>
+                  <y-fields>
+                    <field>[federated.18vlg2l1tzhry21ezrlc10wijj8f].[Multiple Values]</field>
+                  </y-fields>
+                </pane-descriptor>
+                <columns>
+                  <field>[federated.18vlg2l1tzhry21ezrlc10wijj8f].[none:problemsize (heat_stencil_3d_mpi_times_2sys.csv):nk]</field>
+                  <field>[federated.18vlg2l1tzhry21ezrlc10wijj8f].[:Measure Names]</field>
+                  <field>[federated.18vlg2l1tzhry21ezrlc10wijj8f].[Multiple Values]</field>
+                </columns>
+              </tuple-descriptor>
+              <tuple>
+                <value>&quot;N=M=H=20 for T=10000 timesteps&quot;</value>
+                <value>&quot;[federated.18vlg2l1tzhry21ezrlc10wijj8f].[sum:time (seq_times.csv):qk]&quot;</value>
+                <value>2.6800000000000002</value>
+              </tuple>
+            </tuple-reference>
+          </mark-label>
+          <mark-label id='2' label-state='on'>
+            <tuple-reference>
+              <tuple-descriptor>
+                <pane-descriptor>
+                  <x-fields>
+                    <field>[federated.18vlg2l1tzhry21ezrlc10wijj8f].[none:problemsize (heat_stencil_3d_mpi_times_2sys.csv):nk]</field>
+                  </x-fields>
+                  <y-fields>
+                    <field>[federated.18vlg2l1tzhry21ezrlc10wijj8f].[Multiple Values]</field>
+                  </y-fields>
+                </pane-descriptor>
+                <columns>
+                  <field>[federated.18vlg2l1tzhry21ezrlc10wijj8f].[none:problemsize (heat_stencil_3d_mpi_times_2sys.csv):nk]</field>
+                  <field>[federated.18vlg2l1tzhry21ezrlc10wijj8f].[:Measure Names]</field>
+                  <field>[federated.18vlg2l1tzhry21ezrlc10wijj8f].[Multiple Values]</field>
+                </columns>
+              </tuple-descriptor>
+              <tuple>
+                <value>&quot;N=M=H=30 for T=15000 timesteps&quot;</value>
+                <value>&quot;[federated.18vlg2l1tzhry21ezrlc10wijj8f].[sum:time (seq_times.csv):qk]&quot;</value>
+                <value>13.640000000000001</value>
+              </tuple>
+            </tuple-reference>
+          </mark-label>
+          <mark-label id='3' label-state='on'>
+            <tuple-reference>
+              <tuple-descriptor>
+                <pane-descriptor>
+                  <x-fields>
+                    <field>[federated.18vlg2l1tzhry21ezrlc10wijj8f].[none:problemsize (heat_stencil_3d_mpi_times_2sys.csv):nk]</field>
+                  </x-fields>
+                  <y-fields>
+                    <field>[federated.18vlg2l1tzhry21ezrlc10wijj8f].[Multiple Values]</field>
+                  </y-fields>
+                </pane-descriptor>
+                <columns>
+                  <field>[federated.18vlg2l1tzhry21ezrlc10wijj8f].[none:problemsize (heat_stencil_3d_mpi_times_2sys.csv):nk]</field>
+                  <field>[federated.18vlg2l1tzhry21ezrlc10wijj8f].[:Measure Names]</field>
+                  <field>[federated.18vlg2l1tzhry21ezrlc10wijj8f].[Multiple Values]</field>
+                </columns>
+              </tuple-descriptor>
+              <tuple>
+                <value>&quot;N=M=H=40 for T=20000 timesteps&quot;</value>
+                <value>&quot;[federated.18vlg2l1tzhry21ezrlc10wijj8f].[sum:time (seq_times.csv):qk]&quot;</value>
+                <value>43.960000000000001</value>
+              </tuple>
+            </tuple-reference>
+          </mark-label>
+          <mark-label id='4' label-state='on'>
+            <tuple-reference>
+              <tuple-descriptor>
+                <pane-descriptor>
+                  <x-fields>
+                    <field>[federated.18vlg2l1tzhry21ezrlc10wijj8f].[none:problemsize (heat_stencil_3d_mpi_times_2sys.csv):nk]</field>
+                  </x-fields>
+                  <y-fields>
+                    <field>[federated.18vlg2l1tzhry21ezrlc10wijj8f].[Multiple Values]</field>
+                  </y-fields>
+                </pane-descriptor>
+                <columns>
+                  <field>[federated.18vlg2l1tzhry21ezrlc10wijj8f].[none:problemsize (heat_stencil_3d_mpi_times_2sys.csv):nk]</field>
+                  <field>[federated.18vlg2l1tzhry21ezrlc10wijj8f].[:Measure Names]</field>
+                  <field>[federated.18vlg2l1tzhry21ezrlc10wijj8f].[Multiple Values]</field>
+                </columns>
+              </tuple-descriptor>
+              <tuple>
+                <value>&quot;N=M=H=50 for T=25000 timesteps&quot;</value>
+                <value>&quot;[federated.18vlg2l1tzhry21ezrlc10wijj8f].[sum:time (seq_times.csv):qk]&quot;</value>
+                <value>106.01000000000001</value>
+              </tuple>
+            </tuple-reference>
+          </mark-label>
+          <mark-label id='5' label-state='on'>
+            <tuple-reference>
+              <tuple-descriptor>
+                <pane-descriptor>
+                  <x-fields>
+                    <field>[federated.18vlg2l1tzhry21ezrlc10wijj8f].[none:problemsize (heat_stencil_3d_mpi_times_2sys.csv):nk]</field>
+                  </x-fields>
+                  <y-fields>
+                    <field>[federated.18vlg2l1tzhry21ezrlc10wijj8f].[Multiple Values]</field>
+                  </y-fields>
+                </pane-descriptor>
+                <columns>
+                  <field>[federated.18vlg2l1tzhry21ezrlc10wijj8f].[none:problemsize (heat_stencil_3d_mpi_times_2sys.csv):nk]</field>
+                  <field>[federated.18vlg2l1tzhry21ezrlc10wijj8f].[:Measure Names]</field>
+                  <field>[federated.18vlg2l1tzhry21ezrlc10wijj8f].[Multiple Values]</field>
+                </columns>
+              </tuple-descriptor>
+              <tuple>
+                <value>&quot;N=M=H=10 for T=5000 timesteps&quot;</value>
+                <value>&quot;[federated.18vlg2l1tzhry21ezrlc10wijj8f].[sum:time:qk]&quot;</value>
+                <value>0.11</value>
+              </tuple>
+            </tuple-reference>
+          </mark-label>
+          <mark-label id='6' label-state='on'>
+            <tuple-reference>
+              <tuple-descriptor>
+                <pane-descriptor>
+                  <x-fields>
+                    <field>[federated.18vlg2l1tzhry21ezrlc10wijj8f].[none:problemsize (heat_stencil_3d_mpi_times_2sys.csv):nk]</field>
+                  </x-fields>
+                  <y-fields>
+                    <field>[federated.18vlg2l1tzhry21ezrlc10wijj8f].[Multiple Values]</field>
+                  </y-fields>
+                </pane-descriptor>
+                <columns>
+                  <field>[federated.18vlg2l1tzhry21ezrlc10wijj8f].[none:problemsize (heat_stencil_3d_mpi_times_2sys.csv):nk]</field>
+                  <field>[federated.18vlg2l1tzhry21ezrlc10wijj8f].[:Measure Names]</field>
+                  <field>[federated.18vlg2l1tzhry21ezrlc10wijj8f].[Multiple Values]</field>
+                </columns>
+              </tuple-descriptor>
+              <tuple>
+                <value>&quot;N=M=H=20 for T=10000 timesteps&quot;</value>
+                <value>&quot;[federated.18vlg2l1tzhry21ezrlc10wijj8f].[sum:time:qk]&quot;</value>
+                <value>0.95999999999999996</value>
+              </tuple>
+            </tuple-reference>
+          </mark-label>
+          <mark-label id='7' label-state='on'>
+            <tuple-reference>
+              <tuple-descriptor>
+                <pane-descriptor>
+                  <x-fields>
+                    <field>[federated.18vlg2l1tzhry21ezrlc10wijj8f].[none:problemsize (heat_stencil_3d_mpi_times_2sys.csv):nk]</field>
+                  </x-fields>
+                  <y-fields>
+                    <field>[federated.18vlg2l1tzhry21ezrlc10wijj8f].[Multiple Values]</field>
+                  </y-fields>
+                </pane-descriptor>
+                <columns>
+                  <field>[federated.18vlg2l1tzhry21ezrlc10wijj8f].[none:problemsize (heat_stencil_3d_mpi_times_2sys.csv):nk]</field>
+                  <field>[federated.18vlg2l1tzhry21ezrlc10wijj8f].[:Measure Names]</field>
+                  <field>[federated.18vlg2l1tzhry21ezrlc10wijj8f].[Multiple Values]</field>
+                </columns>
+              </tuple-descriptor>
+              <tuple>
+                <value>&quot;N=M=H=30 for T=15000 timesteps&quot;</value>
+                <value>&quot;[federated.18vlg2l1tzhry21ezrlc10wijj8f].[sum:time:qk]&quot;</value>
+                <value>6.8399999999999999</value>
+              </tuple>
+            </tuple-reference>
+          </mark-label>
+          <mark-label id='8' label-state='on'>
+            <tuple-reference>
+              <tuple-descriptor>
+                <pane-descriptor>
+                  <x-fields>
+                    <field>[federated.18vlg2l1tzhry21ezrlc10wijj8f].[none:problemsize (heat_stencil_3d_mpi_times_2sys.csv):nk]</field>
+                  </x-fields>
+                  <y-fields>
+                    <field>[federated.18vlg2l1tzhry21ezrlc10wijj8f].[Multiple Values]</field>
+                  </y-fields>
+                </pane-descriptor>
+                <columns>
+                  <field>[federated.18vlg2l1tzhry21ezrlc10wijj8f].[none:problemsize (heat_stencil_3d_mpi_times_2sys.csv):nk]</field>
+                  <field>[federated.18vlg2l1tzhry21ezrlc10wijj8f].[:Measure Names]</field>
+                  <field>[federated.18vlg2l1tzhry21ezrlc10wijj8f].[Multiple Values]</field>
+                </columns>
+              </tuple-descriptor>
+              <tuple>
+                <value>&quot;N=M=H=10 for T=5000 timesteps&quot;</value>
+                <value>&quot;[federated.18vlg2l1tzhry21ezrlc10wijj8f].[sum:time (heat_stencil_3d_mpi_times_2sys.csv):qk]&quot;</value>
+                <value>0.080000000000000002</value>
+              </tuple>
+            </tuple-reference>
+          </mark-label>
+          <mark-label id='9' label-state='on'>
+            <tuple-reference>
+              <tuple-descriptor>
+                <pane-descriptor>
+                  <x-fields>
+                    <field>[federated.18vlg2l1tzhry21ezrlc10wijj8f].[none:problemsize (heat_stencil_3d_mpi_times_2sys.csv):nk]</field>
+                  </x-fields>
+                  <y-fields>
+                    <field>[federated.18vlg2l1tzhry21ezrlc10wijj8f].[Multiple Values]</field>
+                  </y-fields>
+                </pane-descriptor>
+                <columns>
+                  <field>[federated.18vlg2l1tzhry21ezrlc10wijj8f].[none:problemsize (heat_stencil_3d_mpi_times_2sys.csv):nk]</field>
+                  <field>[federated.18vlg2l1tzhry21ezrlc10wijj8f].[:Measure Names]</field>
+                  <field>[federated.18vlg2l1tzhry21ezrlc10wijj8f].[Multiple Values]</field>
+                </columns>
+              </tuple-descriptor>
+              <tuple>
+                <value>&quot;N=M=H=20 for T=10000 timesteps&quot;</value>
+                <value>&quot;[federated.18vlg2l1tzhry21ezrlc10wijj8f].[sum:time (heat_stencil_3d_mpi_times_2sys.csv):qk]&quot;</value>
+                <value>0.83999999999999997</value>
+              </tuple>
+            </tuple-reference>
+          </mark-label>
+          <mark-label id='10' label-state='on'>
+            <tuple-reference>
+              <tuple-descriptor>
+                <pane-descriptor>
+                  <x-fields>
+                    <field>[federated.18vlg2l1tzhry21ezrlc10wijj8f].[none:problemsize (heat_stencil_3d_mpi_times_2sys.csv):nk]</field>
+                  </x-fields>
+                  <y-fields>
+                    <field>[federated.18vlg2l1tzhry21ezrlc10wijj8f].[Multiple Values]</field>
+                  </y-fields>
+                </pane-descriptor>
+                <columns>
+                  <field>[federated.18vlg2l1tzhry21ezrlc10wijj8f].[none:problemsize (heat_stencil_3d_mpi_times_2sys.csv):nk]</field>
+                  <field>[federated.18vlg2l1tzhry21ezrlc10wijj8f].[:Measure Names]</field>
+                  <field>[federated.18vlg2l1tzhry21ezrlc10wijj8f].[Multiple Values]</field>
+                </columns>
+              </tuple-descriptor>
+              <tuple>
+                <value>&quot;N=M=H=30 for T=15000 timesteps&quot;</value>
+                <value>&quot;[federated.18vlg2l1tzhry21ezrlc10wijj8f].[sum:time (heat_stencil_3d_mpi_times_2sys.csv):qk]&quot;</value>
+                <value>6.7199999999999998</value>
+              </tuple>
+            </tuple-reference>
+          </mark-label>
+          <mark-label id='11' label-state='on'>
+            <tuple-reference>
+              <tuple-descriptor>
+                <pane-descriptor>
+                  <x-fields>
+                    <field>[federated.18vlg2l1tzhry21ezrlc10wijj8f].[none:problemsize (heat_stencil_3d_mpi_times_2sys.csv):nk]</field>
+                  </x-fields>
+                  <y-fields>
+                    <field>[federated.18vlg2l1tzhry21ezrlc10wijj8f].[Multiple Values]</field>
+                  </y-fields>
+                </pane-descriptor>
+                <columns>
+                  <field>[federated.18vlg2l1tzhry21ezrlc10wijj8f].[none:problemsize (heat_stencil_3d_mpi_times_2sys.csv):nk]</field>
+                  <field>[federated.18vlg2l1tzhry21ezrlc10wijj8f].[:Measure Names]</field>
+                  <field>[federated.18vlg2l1tzhry21ezrlc10wijj8f].[Multiple Values]</field>
+                </columns>
+              </tuple-descriptor>
+              <tuple>
+                <value>&quot;N=M=H=40 for T=20000 timesteps&quot;</value>
+                <value>&quot;[federated.18vlg2l1tzhry21ezrlc10wijj8f].[sum:time (heat_stencil_3d_mpi_times_2sys.csv):qk]&quot;</value>
+                <value>20.539999999999999</value>
+              </tuple>
+            </tuple-reference>
+          </mark-label>
+          <mark-label id='12' label-state='on'>
+            <tuple-reference>
+              <tuple-descriptor>
+                <pane-descriptor>
+                  <x-fields>
+                    <field>[federated.18vlg2l1tzhry21ezrlc10wijj8f].[none:problemsize (heat_stencil_3d_mpi_times_2sys.csv):nk]</field>
+                  </x-fields>
+                  <y-fields>
+                    <field>[federated.18vlg2l1tzhry21ezrlc10wijj8f].[Multiple Values]</field>
+                  </y-fields>
+                </pane-descriptor>
+                <columns>
+                  <field>[federated.18vlg2l1tzhry21ezrlc10wijj8f].[none:problemsize (heat_stencil_3d_mpi_times_2sys.csv):nk]</field>
+                  <field>[federated.18vlg2l1tzhry21ezrlc10wijj8f].[:Measure Names]</field>
+                  <field>[federated.18vlg2l1tzhry21ezrlc10wijj8f].[Multiple Values]</field>
+                </columns>
+              </tuple-descriptor>
+              <tuple>
+                <value>&quot;N=M=H=50 for T=25000 timesteps&quot;</value>
+                <value>&quot;[federated.18vlg2l1tzhry21ezrlc10wijj8f].[sum:time (heat_stencil_3d_mpi_times_2sys.csv):qk]&quot;</value>
+                <value>49.859999999999999</value>
+              </tuple>
+            </tuple-reference>
+          </mark-label>
+        </mark-labels>
+      </table>
+      <simple-id uuid='{24703187-CCBC-4445-8FEB-0CFF5C322955}' />
+    </worksheet>
+  </worksheets>
+  <windows source-height='30'>
+    <window class='worksheet' maximized='true' name='Planes Comparison'>
+      <cards>
+        <edge name='left'>
+          <strip size='160'>
+            <card type='pages' />
+            <card type='filters' />
+            <card type='marks' />
+            <card type='measures' />
+          </strip>
+        </edge>
+        <edge name='top'>
+          <strip size='2147483647'>
+            <card type='columns' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='rows' />
+          </strip>
+          <strip size='31'>
+            <card type='title' />
+          </strip>
+        </edge>
+        <edge name='right'>
+          <strip size='160'>
+            <card pane-specification-id='0' param='[federated.18vlg2l1tzhry21ezrlc10wijj8f].[:Measure Names]' type='color' />
+          </strip>
+        </edge>
+      </cards>
+      <viewpoint>
+        <zoom type='fit-width' />
+        <highlight>
+          <color-one-way>
+            <field>[federated.18vlg2l1tzhry21ezrlc10wijj8f].[:Measure Names]</field>
+            <field>[federated.18vlg2l1tzhry21ezrlc10wijj8f].[none:problemsize (heat_stencil_3d_mpi_times_2sys.csv):nk]</field>
+            <field>[federated.18vlg2l1tzhry21ezrlc10wijj8f].[none:time (heat_stencil_3d_mpi_times_2sys.csv):nk]</field>
+          </color-one-way>
+        </highlight>
+      </viewpoint>
+      <simple-id uuid='{0BC731BC-B3CC-48C7-A279-3583777A0271}' />
+    </window>
+  </windows>
+  <thumbnails>
+    <thumbnail height='384' name='Planes Comparison' width='384'>
+      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
+      Kh9T/x+l5WKjUSR+zQAAAABJRU5ErkJggg==
+    </thumbnail>
+  </thumbnails>
+</workbook>
