@@ -1,0 +1,8 @@
+problemsize, time
+N=M=H=10 for T=5000 timesteps,0.11
+N=M=H=20 for T=10000 timesteps,0.96
+N=M=H=30 for T=15000 timesteps,6.84
+N=M=H=40 for T=20000 timesteps,inf
+N=M=H=50 for T=25000 timesteps,inf
+N=M=H=100 for T=50000 timesteps,inf
+N=M=H=200 for T=100000 timesteps,inf
