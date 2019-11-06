@@ -30,7 +30,7 @@ void printTemperature(Room m, int N, int M, int H);
 int main(int argc, char **argv)
 {
   // 'parsing' optional input parameter = problem size
-  int Nx = 9; // columns
+  int Nx = 9;  // columns
   int Ny = 11; // rows
   int Nz = 13; // height
   if (argc > 1)
@@ -50,9 +50,8 @@ int main(int argc, char **argv)
   MPI_Comm_size(MPI_COMM_WORLD, &number_of_ranks); //get the number of ranks
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);            //get the rankof the caller
 
-
   MPI_Datatype subarrayType;
-  int size[3] = {Nz, Ny, Nx}; 
+  int size[3] = {Nz, Ny, Nx};
   int subSize[3] = {Nz, Ny, Nx};
   int start[3] = {0, 0, 0};
   MPI_Type_create_subarray(3, size, subSize, start, MPI_ORDER_C, MPI_DOUBLE, &subarrayType);
@@ -119,7 +118,7 @@ int main(int argc, char **argv)
   int local_y_end;
   int local_z_end;
 
-  int coord[2] = {0,0};
+  int coord[2] = {0, 0};
   MPI_Cart_coords(comm_cart, rank, ndims, coord);
 
   local_y_start = coord[0] * Ny / dims[0];
@@ -134,7 +133,7 @@ int main(int argc, char **argv)
     local_z_length += Nz % dims[1];
   local_z_end = local_z_start + local_z_length;
 
-  printf("Rank %d: #y = %d - %d, #z = %d - %d\n",rank, local_y_start, local_y_end, local_z_start, local_z_end);
+  printf("Rank %d: #y = %d - %d, #z = %d - %d\n", rank, local_y_start, local_y_end, local_z_start, local_z_end);
 
   // ---------- compute ----------
   // create a second buffer for the computation
@@ -160,19 +159,24 @@ int main(int argc, char **argv)
     // lower upper ghostcell exchange
     // ##########################################
 
-    for (int i = 0; i < local_y_length; i++) {
+    for (int i = 0; i < local_y_length; i++)
+    {
       lower_plane[i] = A[local_z_end][local_y_start + i];
       upper_plane[i] = A[local_z_start][local_y_start + i];
     }
-
-    if (upper_rank < 0)
+    if (upper_rank == lower_rank)
+    {
+      /* There is no upper / lower rank, both are negative */
+    }
+    else if (upper_rank < 0)
     {
       // Upper rank does not exist, only receive one from below and send one to below
       MPI_Send(&(lower_plane[0][0]), Nx * local_y_length, MPI_DOUBLE, lower_rank, 0, comm_cart);
       MPI_Recv(&(received_lower_plane[0][0]), Nx * local_y_length, MPI_DOUBLE, lower_rank, 0, comm_cart, MPI_STATUS_IGNORE);
 
       // Received the last local plane from the lower rank, appending it as the new last local plane
-      for (int i = 0; i < local_y_length; i++) {
+      for (int i = 0; i < local_y_length; i++)
+      {
         A[local_z_end + 1][local_y_start + i] = received_lower_plane[i];
       }
     }
@@ -184,7 +188,8 @@ int main(int argc, char **argv)
       MPI_Send(&(upper_plane[0][0]), Nx * local_y_length, MPI_DOUBLE, upper_rank, 0, comm_cart);
 
       // Received the first local plane from the upper rank, appending it as the new last local plane
-      for (int i = 0; i < local_y_length; i++) {
+      for (int i = 0; i < local_y_length; i++)
+      {
         A[local_z_start - 1][local_y_start + i] = received_upper_plane[i];
       }
     }
@@ -196,7 +201,8 @@ int main(int argc, char **argv)
       MPI_Isend(&(lower_plane[0][0]), Nx * local_y_length, MPI_DOUBLE, lower_rank, 0, comm_cart, &request);
       MPI_Recv(&(received_upper_plane[0][0]), Nx * local_y_length, MPI_DOUBLE, upper_rank, 0, comm_cart, MPI_STATUS_IGNORE);
       MPI_Recv(&(received_lower_plane[0][0]), Nx * local_y_length, MPI_DOUBLE, lower_rank, 0, comm_cart, MPI_STATUS_IGNORE);
-      for (int i = 0; i < local_y_length; i++) {
+      for (int i = 0; i < local_y_length; i++)
+      {
         A[local_z_start - 1][local_y_start + i] = received_upper_plane[i];
         A[local_z_end + 1][local_y_start + i] = received_lower_plane[i];
       }
@@ -206,11 +212,14 @@ int main(int argc, char **argv)
     // left right ghostcell exchange
     // ##########################################
 
-    for (int i = 0; i < local_z_length; i++) {
-        left_plane[i] = A[local_z_start + i][local_y_end];
-        right_plane[i] = A[local_z_start + i][local_y_start];
+    for (int i = 0; i < local_z_length; i++)
+    {
+      left_plane[i] = A[local_z_start + i][local_y_end];
+      right_plane[i] = A[local_z_start + i][local_y_start];
     }
-
+    if (right_rank == left_rank)
+    {
+    }
     if (left_rank < 0)
     {
       // Left rank does not exist, only receive one from right and send one to right
@@ -218,7 +227,8 @@ int main(int argc, char **argv)
       MPI_Recv(&(received_right_plane[0][0]), Nx * local_z_length, MPI_DOUBLE, right_rank, 0, comm_cart, MPI_STATUS_IGNORE);
 
       // Received the last local plane from the right rank, appending it as the new last local plane
-      for (int i = 0; i < local_z_length; i++) {
+      for (int i = 0; i < local_z_length; i++)
+      {
         A[local_z_start + i][local_y_end + 1] = received_right_plane[i];
       }
     }
@@ -229,7 +239,8 @@ int main(int argc, char **argv)
       MPI_Send(&(left_plane[0][0]), Nx * local_y_length, MPI_DOUBLE, left_rank, 0, comm_cart);
 
       // Received the first local plane from the upper rank, appending it as the new last local plane
-      for (int i = 0; i < local_z_length; i++) {
+      for (int i = 0; i < local_z_length; i++)
+      {
         A[local_z_start + i][local_y_start - 1] = received_left_plane[i];
       }
     }
@@ -241,7 +252,8 @@ int main(int argc, char **argv)
       MPI_Isend(&(right_plane[0][0]), Nx * local_y_length, MPI_DOUBLE, right_rank, 0, comm_cart, &request);
       MPI_Recv(&(received_left_plane[0][0]), Nx * local_y_length, MPI_DOUBLE, left_rank, 0, comm_cart, MPI_STATUS_IGNORE);
       MPI_Recv(&(received_right_plane[0][0]), Nx * local_y_length, MPI_DOUBLE, right_rank, 0, comm_cart, MPI_STATUS_IGNORE);
-      for (int i = 0; i < local_z_length; i++) {
+      for (int i = 0; i < local_z_length; i++)
+      {
         A[local_z_start + i][local_y_start - 1] = received_left_plane[i];
         A[local_z_start + i][local_y_end + 1] = received_right_plane[i];
       }
@@ -301,7 +313,7 @@ int main(int argc, char **argv)
         for (int orank = 1; orank < number_of_ranks; orank++)
         {
 
-          int orank_cord[2] = {0,0};
+          int orank_cord[2] = {0, 0};
           MPI_Cart_coords(comm_cart, orank, ndims, orank_cord);
 
           int temp_y_start = orank_cord[0] * Ny / dims[0];
@@ -336,13 +348,16 @@ int main(int argc, char **argv)
         printTemperature(comb, Nx, Ny, Nz);
         releaseRoom(comb);
       }
-      else {
+      else
+      {
         // printf("\nSend array %d\n", rank);
-        //MPI_Request req;   
-        Room send_subroom = createRoom(Nx,local_y_length, local_z_length);
+        //MPI_Request req;
+        Room send_subroom = createRoom(Nx, local_y_length, local_z_length);
 
-        for (int i = 0; i < local_z_length; i++) {
-          for (int j = 0; j < local_y_length; j++) {
+        for (int i = 0; i < local_z_length; i++)
+        {
+          for (int j = 0; j < local_y_length; j++)
+          {
             send_subroom[i][j] = A[local_z_start + i][local_y_start + j];
           }
         }
@@ -371,7 +386,7 @@ int main(int argc, char **argv)
     for (int orank = 1; orank < number_of_ranks; orank++)
     {
 
-      int orank_cord[2] = {0,0};
+      int orank_cord[2] = {0, 0};
       MPI_Cart_coords(comm_cart, orank, ndims, orank_cord);
 
       int temp_y_start = orank_cord[0] * Ny / dims[0];
@@ -431,16 +446,17 @@ int main(int argc, char **argv)
     printf("3d pole MPI heat stencil took %f seconds to execute \n", time_taken);
 
     printf("Verification: %s\n", (success) ? "OK" : "FAILED");
-
   }
   else
   {
     // printf("\nSend array %d\n", rank);
-    //MPI_Request req;   
-    Room send_subroom = createRoom(Nx,local_y_length, local_z_length);
+    //MPI_Request req;
+    Room send_subroom = createRoom(Nx, local_y_length, local_z_length);
 
-    for (int i = 0; i < local_z_length; i++) {
-      for (int j = 0; j < local_y_length; j++) {
+    for (int i = 0; i < local_z_length; i++)
+    {
+      for (int j = 0; j < local_y_length; j++)
+      {
         send_subroom[i][j] = A[local_z_start + i][local_y_start + j];
       }
     }
