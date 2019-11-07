@@ -38,10 +38,10 @@ int MAX(int x, int y);
 int main(int argc, char **argv)
 {
   // 'parsing' optional input parameter = problem size
-  int Nx = 200; // columns
-  int Ny = 200; // rows
+  int Nx = 2000; // columns
+  int Ny = 2000; // rows
   int particle_count = 100;  // particles
-  int max_Mass = 10;
+  int max_Mass = 1000;
   clock_t clock_time;
   bool print = true;
   srand(time(NULL));
@@ -52,7 +52,7 @@ int main(int argc, char **argv)
     Ny = atoi(argv[2]);
     particle_count = atoi(argv[3]);
   }
-  int T = 20; // (Nx < Ny ? Ny : Nx) * 500;
+  int T = 1000; // (Nx < Ny ? Ny : Nx) * 500;
   
   clock_time = clock();
   // ---------- setup ----------
@@ -65,7 +65,7 @@ int main(int argc, char **argv)
   {
     P[i].pos.x = Nx * (double)rand() / RAND_MAX; //float in range 0 to Nx;
     P[i].pos.y = Ny * (double)rand() / RAND_MAX; //float in range 0 to Ny;
-    P[i].mass = max_Mass * (double)rand() / RAND_MAX + 100; //float in range 1 to max_Mass;
+    P[i].mass = max_Mass * (double)rand() / RAND_MAX + 10; //float in range 1 to max_Mass;
     P[i].velocity.x = 0;
     P[i].velocity.y = 0;
   }
@@ -87,8 +87,8 @@ int main(int argc, char **argv)
     {
       for (int j = i+1; j < particle_count; j++)
       {  
-        float deltaX = P[i].pos.x - P[j].pos.x;
-        float deltaY = P[i].pos.y - P[j].pos.y;
+        float deltaX = P[j].pos.x - P[i].pos.x;
+        float deltaY = P[j].pos.y - P[i].pos.y;
         
         // c² = a² + b² , no abs needed - square makes it positive
         double square_radius = pow(deltaX, 2) + pow(deltaY, 2);
@@ -98,17 +98,17 @@ int main(int argc, char **argv)
         // calculate angle
         // TODO fix it
         float angle = atan2(deltaY, deltaX);
-        P[i].velocity.x += force / P[i].mass * cos(angle);
-        P[i].velocity.y += force / P[i].mass * sin(angle);
-        P[j].velocity.x += force / P[i].mass * cos(angle + 180);
-        P[j].velocity.y += force / P[i].mass * sin(angle + 180);
+        P[i].velocity.x += (force / P[i].mass) * cos(angle);
+        P[i].velocity.y += (force / P[i].mass) * sin(angle);
+        P[j].velocity.x += (force / P[j].mass) * cos(angle + M_PI);
+        P[j].velocity.y += (force / P[j].mass) * sin(angle + M_PI);
       }
       P[i].pos.x += P[i].velocity.x;
       P[i].pos.y += P[i].velocity.y;
     }
 
     // show intermediate step
-    if (!(t % 10) && print)
+    if (!(t % 100) && print)
     {
       printf("Step t=%d:\n", t);
       printParticles(particle_count, P, Nx, Ny);
