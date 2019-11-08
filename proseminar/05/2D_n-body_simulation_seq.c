@@ -33,6 +33,9 @@ void printParticles(int particle_count, struct particle *P, int Nx, int Ny);
 
 int MIN(int x, int y);
 int MAX(int x, int y);
+double rand_gen();
+// use it: sigma * normalRandom + µ
+double normalRandom();
 // -- simulation code ---
 
 int main(int argc, char **argv)
@@ -41,7 +44,7 @@ int main(int argc, char **argv)
   int Nx = 2000; // columns
   int Ny = 2000; // rows
   int particle_count = 100;  // particles
-  int max_Mass = 1000;
+  int max_Mass = 10000000;
   clock_t clock_time;
   bool print = true;
   srand(time(NULL));
@@ -52,20 +55,19 @@ int main(int argc, char **argv)
     Ny = atoi(argv[2]);
     particle_count = atoi(argv[3]);
   }
-  int T = 1000; // (Nx < Ny ? Ny : Nx) * 500;
+  int T = 50; // (Nx < Ny ? Ny : Nx) * 500;
   
   clock_time = clock();
   // ---------- setup ----------
 
-  // create a buffer for storing temperature fields
   struct particle P[particle_count];
 
-  // set up initial conditions in A
+  // set up initial conditions in P
   for (int i = 0; i < particle_count; i++)
   {
-    P[i].pos.x = Nx * (double)rand() / RAND_MAX; //float in range 0 to Nx;
-    P[i].pos.y = Ny * (double)rand() / RAND_MAX; //float in range 0 to Ny;
-    P[i].mass = max_Mass * (double)rand() / RAND_MAX + 10; //float in range 1 to max_Mass;
+    P[i].pos.x = Nx / 10 * normalRandom() + Nx / 2; //float in range 0 to Nx;
+    P[i].pos.y = Ny / 10 * normalRandom() + Ny / 2; //float in range 0 to Ny;
+    P[i].mass = max_Mass * rand_gen() + 1; //float in range 1 to max_Mass;
     P[i].velocity.x = 0;
     P[i].velocity.y = 0;
   }
@@ -82,7 +84,9 @@ int main(int argc, char **argv)
   // for each time step ..
   for (int t = 0; t < T; t++)
   {
-    // .. we propagate the temperature
+    // int min_x = 0, max_x = 0;
+    // int min_y = 0, max_y = 0;
+    // .. we propagate the positions
     for (int i = 0; i < particle_count; i++)
     {
       for (int j = i+1; j < particle_count; j++)
@@ -96,7 +100,6 @@ int main(int argc, char **argv)
 
         // https://stackoverflow.com/questions/39818833/moving-an-object-from-one-point-to-another
         // calculate angle
-        // TODO fix it
         float angle = atan2(deltaY, deltaX);
         P[i].velocity.x += (force / P[i].mass) * cos(angle);
         P[i].velocity.y += (force / P[i].mass) * sin(angle);
@@ -105,10 +108,20 @@ int main(int argc, char **argv)
       }
       P[i].pos.x += P[i].velocity.x;
       P[i].pos.y += P[i].velocity.y;
+    
+      // TODO maybe update Nx and Ny 
+      // min_x = MIN(P[i].pos.x, min_x);
+      // max_x = MAX(P[i].pos.x, max_x);
+      // min_y = MIN(P[i].pos.y, min_y);
+      // max_y = MAX(P[i].pos.y, max_y);
     }
+    // Nx = max_x
+    // Mx = min_x;
+    // Ny = max_y;
+    // My = min_y;
 
     // show intermediate step
-    if (!(t % 100) && print)
+    if (!(t % 5) && print)
     {
       printf("Step t=%d:\n", t);
       printParticles(particle_count, P, Nx, Ny);
@@ -162,7 +175,7 @@ void releaseMatrix(Matrix m) { free(m); }
 // TODO refactor - extract to methode
 // particleComputation()
 
-// TODO
+// TODO maybe skale it?
 void printParticles(int particle_count, struct particle *P, int Nx, int Ny)
 {
   const char *colors = " .-:=+*^X#%@";
@@ -203,10 +216,24 @@ void printParticles(int particle_count, struct particle *P, int Nx, int Ny)
   releaseMatrix(A);
 }
 
-int MIN(int x, int y){
+int MIN(int x, int y)
+{
   return x > y ? y : x;
 }
 
-int MAX(int x, int y){
+int MAX(int x, int y)
+{
   return x < y ? y : x;
+}
+
+// return a uniformly distributed random value
+double rand_gen() {
+   return (double) rand() / (double) (RAND_MAX);
+}
+// return a normally distributed random value 
+// (https://en.wikipedia.org/wiki/Box%E2%80%93Muller_transform)
+double normalRandom() {
+   double v1=rand_gen();
+   double v2=rand_gen();
+   return cos(2.*M_PI*v2)*sqrt(-2.*log(v1));
 }
