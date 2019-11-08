@@ -29,8 +29,8 @@ Matrix createMatrix(int Nx, int Ny);
 
 void releaseMatrix(Matrix m);
 
-void printParticles(int particle_count, struct particle *P, int Mx, int My,
-                    int Nx, int Ny);
+void printParticles(int particle_count, struct particle *P, long long Mx,
+                    long long My, long long Nx, long long Ny);
 
 long long MIN(long long x, long long y);
 long long MAX(long long x, long long y);
@@ -41,10 +41,10 @@ double normalRandom();
 
 int main(int argc, char **argv) {
     // 'parsing' optional input parameter = problem size
-    int Nx = 2000;              // columns
-    int Ny = 2000;              // rows
-    int particle_count = 1000;  // particles
-    int max_Mass = 10000000;
+    long long Nx = 2000;       // columns
+    long long Ny = 2000;       // rows
+    int particle_count = 2000;  // particles
+    int max_Mass = 10000;
     clock_t clock_time;
     bool print = true;
     srand(time(NULL));
@@ -54,7 +54,7 @@ int main(int argc, char **argv) {
         Ny = atoi(argv[2]);
         particle_count = atoi(argv[3]);
     }
-    int T = 50;  // (Nx < Ny ? Ny : Nx) * 500;
+    int T = 100;  // (Nx < Ny ? Ny : Nx) * 500;
 
     clock_time = clock();
     // ---------- setup ----------
@@ -108,10 +108,17 @@ int main(int argc, char **argv) {
             P[i].pos.x += P[i].velocity.x;
             P[i].pos.y += P[i].velocity.y;
 
-            min_x = MIN(P[i].pos.x, min_x);
-            max_x = MAX(P[i].pos.x, max_x);
-            min_y = MIN(P[i].pos.y, min_y);
-            max_y = MAX(P[i].pos.y, max_y);
+            // if (P[i].pos.x < 0.0) {
+            //     printf("x: %f\n", P[i].pos.x);
+            // }
+            // if (P[i].pos.y < 0.0) {
+            //     printf("y: %f\n", P[i].pos.y);
+            // }
+
+            min_x = MIN((long long)P[i].pos.x, min_x);
+            max_x = MAX((long long)P[i].pos.x, max_x);
+            min_y = MIN((long long)P[i].pos.y, min_y);
+            max_y = MAX((long long)P[i].pos.y, max_y);
         }
         Nx = max_x;
         Ny = max_y;
@@ -128,8 +135,8 @@ int main(int argc, char **argv) {
     if (print) {
         printf("Final:\n");
         printParticles(particle_count, P, min_x, min_y, Nx, Ny);
-        printf("minx: %llu, miny: %llu\n", min_x, min_y);
-        printf("maxx: %llu, maxy: %llu\n", max_x, max_y);
+        printf("minx: %lld, miny: %lld\n", min_x, min_y);
+        printf("maxx: %lld, maxy: %lld\n", max_x, max_y);
         printf("\n");
     }
 
@@ -170,8 +177,8 @@ void releaseMatrix(Matrix m) { free(m); }
 // TODO refactor - extract to methode
 // particleComputation()
 
-void printParticles(int particle_count, struct particle *P, int Mx, int My,
-                    int Nx, int Ny) {
+void printParticles(int particle_count, struct particle *P, long long Mx,
+                    long long My, long long Nx, long long Ny) {
     const char *colors = " .-:=+*^X#%@";
     const int numColors = 12;
 
@@ -186,8 +193,8 @@ void printParticles(int particle_count, struct particle *P, int Mx, int My,
     Matrix A = createMatrix(W, H);
 
     for (int i = 0; i < particle_count; i++) {
-        int y = MAX(MIN(((int)P[i].pos.y - My) / yW, H - 1), 0);
-        int x = MAX(MIN(((int)P[i].pos.x - Mx) / xW, W - 1), 0);
+        int y = MAX(MIN((P[i].pos.y - My) / yW, H - 1), 0);
+        int x = MAX(MIN((P[i].pos.x - Mx) / xW, W - 1), 0);
         A[y][x]++;
     }
 
