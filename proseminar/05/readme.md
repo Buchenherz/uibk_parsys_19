@@ -18,10 +18,11 @@ For each timestep (you can assume `dt = 1`), particles must be moved by first co
 ### Tasks
 
 - Provide a sequential implementation of the n-body simulation in 2D. Hints on how to proceed (not mandatory to follow):
-	1. generate particles randomly, e.g. uniformly distributed
+	1. generate particles randomly, e.g. uniformly distributed (at least velocity and position random)
 	2. provide a function for computing forces and moving particles
 	3. move particles in a time loop for a given number of steps
 - Measure the execution time for various problem sizes. What can you observe?
+	1. Scaling in regards to problem size
 
 ## Exercise 2
 
