@@ -88,6 +88,7 @@ int main(int argc, char **argv) {
     long long *min_y = malloc(sizeof(long long)),
               *max_y = malloc(sizeof(long long));
 
+    // Init min / max 
     *min_x = 0, *max_x = 0;
     *min_y = 0, *max_y = 0;
 
@@ -101,7 +102,7 @@ int main(int argc, char **argv) {
 
     // for each time step ..
     for (int t = 0; t < T; t++) {
-        // Init min / max (TODO: Why are we setting this each timestamp?)
+        // Set min / max to 0 to minimize the print size - if the outest particles move closer to the center
         *min_x = 0, *max_x = 0;
         *min_y = 0, *max_y = 0;
 
