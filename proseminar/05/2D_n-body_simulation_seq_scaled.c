@@ -88,7 +88,7 @@ int main(int argc, char **argv) {
     long long *min_y = malloc(sizeof(long long)),
               *max_y = malloc(sizeof(long long));
 
-    // Init min / max 
+    // Init min / max
     *min_x = 0, *max_x = 0;
     *min_y = 0, *max_y = 0;
 
@@ -102,7 +102,8 @@ int main(int argc, char **argv) {
 
     // for each time step ..
     for (int t = 0; t < T; t++) {
-        // Set min / max to 0 to minimize the print size - if the outest particles move closer to the center
+        // Set min / max to 0 to minimize the print size - if the outest
+        // particles move closer to the center
         *min_x = 0, *max_x = 0;
         *min_y = 0, *max_y = 0;
 
@@ -197,15 +198,29 @@ void printParticles(int particle_count, struct particle *P, long long *Mx,
 
     // room
     for (int i = 0; i < H; i++) {
+        if (i == 0) {
+            printf("┌");
+            for (int k = 0; k < W; k++) {
+                printf("─");
+            }
+            printf("┐\n");
+        }
         // left wall
-        printf("|");
+        printf("│");
         // actual room
         for (int j = 0; j < W; j++) {
             int c = A[i][j] > numColors ? 11 : A[i][j];
             printf("%c", colors[c]);
         }
         // right wall
-        printf("|\n");
+        printf("│\n");
+        if (i == H - 1) {
+            printf("└");
+            for (int k = 0; k < W; k++) {
+                printf("─");
+            }
+            printf("┘\n");
+        }
     }
 
     releaseMatrix(A);
