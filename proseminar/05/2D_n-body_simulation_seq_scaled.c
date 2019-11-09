@@ -11,26 +11,42 @@ typedef int value_t;
 
 // -- Matrix utilities --
 
-struct particle {
-    struct pos {
+typedef struct particle {
+    struct position {
         double x;
         double y;
     } pos;
     struct velocity {
         double x;
         double y;
-    } velocity;
+    } vel;
     double mass;
-};
+} particle;
 
 typedef value_t **Matrix;
 
 Matrix createMatrix(int Nx, int Ny);
-
 void releaseMatrix(Matrix m);
 
-void printParticles(int particle_count, struct particle *P, long long Mx,
-                    long long My, long long Nx, long long Ny);
+void initParticles(particle *P, int particle_count, long long Nx, long long Ny,
+                   int max_Mass);
+
+/**
+ * Calculates the forces of particle `i` in an array of particles `P` where P
+ * contains `particle_count` total particles.
+ */
+void calculateParticleForces(particle *P, int i, int particle_count);
+
+/**
+ * Updates the position of particle `i` in an array of particles `P` containing
+ * `particle_count` particles.
+ */
+void updateParticlePositions(particle *P, int i, long long *min_x,
+                             long long *max_x, long long *min_y,
+                             long long *max_y);
+
+void printParticles(int particle_count, struct particle *P, long long *Mx,
+                    long long *My, long long *Nx, long long *Ny);
 
 long long MIN(long long x, long long y);
 long long MAX(long long x, long long y);
@@ -41,8 +57,10 @@ double normalRandom();
 
 int main(int argc, char **argv) {
     // 'parsing' optional input parameter = problem size
-    long long Nx = 2000;       // columns
-    long long Ny = 2000;       // rows
+
+    // Initial set of the scale of the universe
+    long long Nx = 2000;        // columns
+    long long Ny = 2000;        // rows
     int particle_count = 2000;  // particles
     int max_Mass = 10000;
     clock_t clock_time;
@@ -54,79 +72,49 @@ int main(int argc, char **argv) {
         Ny = atoi(argv[2]);
         particle_count = atoi(argv[3]);
     }
-    int T = 100;  // (Nx < Ny ? Ny : Nx) * 500;
+    int T = 50;  // (Nx < Ny ? Ny : Nx) * 500;
 
     clock_time = clock();
     // ---------- setup ----------
 
-    struct particle P[particle_count];
+    particle *P = malloc(particle_count * sizeof(*P));
 
     // set up initial conditions in P
-    for (int i = 0; i < particle_count; i++) {
-        P[i].pos.x =
-            Nx / 10 * normalRandom() + Nx / 2;  // float in range 0 to Nx;
-        P[i].pos.y =
-            Ny / 10 * normalRandom() + Ny / 2;  // float in range 0 to Ny;
-        P[i].mass = max_Mass * rand_gen() + 1;  // float in range 1 to max_Mass;
-        P[i].velocity.x = 0;
-        P[i].velocity.y = 0;
-    }
+    initParticles(P, particle_count, Nx, Ny, max_Mass);
+
+    // allocate min / max values for future print scale
+    long long *min_x = malloc(sizeof(long long)),
+              *max_x = malloc(sizeof(long long));
+    long long *min_y = malloc(sizeof(long long)),
+              *max_y = malloc(sizeof(long long));
+
+    *min_x = 0, *max_x = 0;
+    *min_y = 0, *max_y = 0;
 
     if (print) {
         printf("Initial:\n");
-        printParticles(particle_count, P, 0, 0, Nx, Ny);
+        printParticles(particle_count, P, min_x, min_y, &Nx, &Ny);
         printf("\n");
     }
 
     // ---------- compute ----------
 
-    long long min_x = 0, max_x = 0;
-    long long min_y = 0, max_y = 0;
-
     // for each time step ..
     for (int t = 0; t < T; t++) {
-        min_x = 0, max_x = 0;
-        min_y = 0, max_y = 0;
+        // Init min / max (TODO: Why are we setting this each timestamp?)
+        *min_x = 0, *max_x = 0;
+        *min_y = 0, *max_y = 0;
+
         // .. we propagate the positions
         for (int i = 0; i < particle_count; i++) {
-            for (int j = i + 1; j < particle_count; j++) {
-                float deltaX = P[j].pos.x - P[i].pos.x;
-                float deltaY = P[j].pos.y - P[i].pos.y;
-
-                // c² = a² + b² , no abs needed - square makes it positive
-                double square_radius = pow(deltaX, 2) + pow(deltaY, 2);
-                double force = (P[i].mass * P[j].mass) / square_radius;
-
-                // https://stackoverflow.com/questions/39818833/moving-an-object-from-one-point-to-another
-                // calculate angle
-                float angle = atan2(deltaY, deltaX);
-                P[i].velocity.x += (force / P[i].mass) * cos(angle);
-                P[i].velocity.y += (force / P[i].mass) * sin(angle);
-                P[j].velocity.x += (force / P[j].mass) * cos(angle + M_PI);
-                P[j].velocity.y += (force / P[j].mass) * sin(angle + M_PI);
-            }
-            P[i].pos.x += P[i].velocity.x;
-            P[i].pos.y += P[i].velocity.y;
-
-            // if (P[i].pos.x < 0.0) {
-            //     printf("x: %f\n", P[i].pos.x);
-            // }
-            // if (P[i].pos.y < 0.0) {
-            //     printf("y: %f\n", P[i].pos.y);
-            // }
-
-            min_x = MIN((long long)P[i].pos.x, min_x);
-            max_x = MAX((long long)P[i].pos.x, max_x);
-            min_y = MIN((long long)P[i].pos.y, min_y);
-            max_y = MAX((long long)P[i].pos.y, max_y);
+            calculateParticleForces(P, i, particle_count);
+            updateParticlePositions(P, i, min_x, max_x, min_y, max_y);
         }
-        Nx = max_x;
-        Ny = max_y;
 
         // show intermediate step
         if (!(t % 5) && print) {
             printf("Step t=%d:\n", t);
-            printParticles(particle_count, P, min_x, min_y, Nx, Ny);
+            printParticles(particle_count, P, min_x, min_y, max_x, max_y);
             printf("\n");
         }
     }
@@ -134,9 +122,9 @@ int main(int argc, char **argv) {
     // ---------- check ----------
     if (print) {
         printf("Final:\n");
-        printParticles(particle_count, P, min_x, min_y, Nx, Ny);
-        printf("minx: %lld, miny: %lld\n", min_x, min_y);
-        printf("maxx: %lld, maxy: %lld\n", max_x, max_y);
+        printParticles(particle_count, P, min_x, min_y, max_x, max_y);
+        printf("minx: %lld, miny: %lld\n", *min_x, *min_y);
+        printf("maxx: %lld, maxy: %lld\n", *max_x, *max_y);
         printf("\n");
     }
 
@@ -159,6 +147,14 @@ int main(int argc, char **argv) {
     printf("2D_n-body_simulation_seq took %f seconds to execute \n",
            time_taken);
 
+    // free the min and max values
+    free(min_x);
+    free(max_x);
+    free(min_y);
+    free(max_y);
+    // Free the Particle array
+    free(P);
+
     // done
     return (success) ? EXIT_SUCCESS : EXIT_FAILURE;
 }
@@ -177,8 +173,8 @@ void releaseMatrix(Matrix m) { free(m); }
 // TODO refactor - extract to methode
 // particleComputation()
 
-void printParticles(int particle_count, struct particle *P, long long Mx,
-                    long long My, long long Nx, long long Ny) {
+void printParticles(int particle_count, struct particle *P, long long *Mx,
+                    long long *My, long long *Nx, long long *Ny) {
     const char *colors = " .-:=+*^X#%@";
     const int numColors = 12;
 
@@ -187,14 +183,14 @@ void printParticles(int particle_count, struct particle *P, long long Mx,
     int H = RESOLUTION_Y;
 
     // step size in each dimension
-    int xW = (Nx - Mx) / W;
-    int yW = (Ny - My) / H;
+    int xW = (*Nx - *Mx) / W;
+    int yW = (*Ny - *My) / H;
 
     Matrix A = createMatrix(W, H);
 
     for (int i = 0; i < particle_count; i++) {
-        int y = MAX(MIN((P[i].pos.y - My) / yW, H - 1), 0);
-        int x = MAX(MIN((P[i].pos.x - Mx) / xW, W - 1), 0);
+        int y = MAX(MIN((P[i].pos.y - *My) / yW, H - 1), 0);
+        int x = MAX(MIN((P[i].pos.x - *Mx) / xW, W - 1), 0);
         A[y][x]++;
     }
 
@@ -220,10 +216,57 @@ long long MAX(long long x, long long y) { return x < y ? y : x; }
 
 // return a uniformly distributed random value
 double rand_gen() { return (double)rand() / (double)(RAND_MAX); }
+
 // return a normally distributed random value
 // (https://en.wikipedia.org/wiki/Box%E2%80%93Muller_transform)
 double normalRandom() {
     double v1 = rand_gen();
     double v2 = rand_gen();
     return cos(2. * M_PI * v2) * sqrt(-2. * log(v1));
+}
+
+void initParticles(particle *P, int particle_count, long long Nx, long long Ny,
+                   int max_Mass) {
+    for (int i = 0; i < particle_count; i++) {
+        P[i].pos.x =
+            Nx / 10 * normalRandom() + Nx / 2;  // float in range 0 to Nx;
+        P[i].pos.y =
+            Ny / 10 * normalRandom() + Ny / 2;  // float in range 0 to Ny;
+        P[i].mass = max_Mass * rand_gen() + 1;  // float in range 1 to max_Mass;
+        P[i].vel.x = 0;
+        P[i].vel.y = 0;
+    }
+}
+
+void calculateParticleForces(particle *P, int i, int particle_count) {
+    for (int j = i + 1; j < particle_count; j++) {
+        float deltaX = P[j].pos.x - P[i].pos.x;
+        float deltaY = P[j].pos.y - P[i].pos.y;
+
+        // c² = a² + b² , no abs needed - square makes it positive
+        double square_radius = pow(deltaX, 2) + pow(deltaY, 2);
+        double force = (P[i].mass * P[j].mass) / square_radius;
+
+        // https://stackoverflow.com/questions/39818833/moving-an-object-from-one-point-to-another
+        // calculate angle
+        float angle = atan2(deltaY, deltaX);
+        P[i].vel.x += (force / P[i].mass) * cos(angle);
+        P[i].vel.y += (force / P[i].mass) * sin(angle);
+        P[j].vel.x += (force / P[j].mass) * cos(angle + M_PI);
+        P[j].vel.y += (force / P[j].mass) * sin(angle + M_PI);
+    }
+}
+
+void updateParticlePositions(particle *P, int i, long long *min_x,
+                             long long *max_x, long long *min_y,
+                             long long *max_y) {
+    P[i].pos.x += P[i].vel.x;
+    P[i].pos.y += P[i].vel.y;
+
+    // Check and set new minimum and maximum values for future
+    // print scaling
+    *min_x = MIN((long long)P[i].pos.x, *min_x);
+    *max_x = MAX((long long)P[i].pos.x, *max_x);
+    *min_y = MIN((long long)P[i].pos.y, *min_y);
+    *max_y = MAX((long long)P[i].pos.y, *max_y);
 }
