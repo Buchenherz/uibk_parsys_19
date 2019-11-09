@@ -9,6 +9,10 @@ typedef int value_t;
 #define RESOLUTION_X 100
 #define RESOLUTION_Y 20
 
+#ifndef M_PI
+#define M_PI           3.14159265358979323846
+#endif
+
 // -- Matrix utilities --
 
 typedef struct particle {
@@ -88,7 +92,7 @@ int main(int argc, char **argv) {
     long long *min_y = malloc(sizeof(long long)),
               *max_y = malloc(sizeof(long long));
 
-    // Init min / max
+    // Init min / max 
     *min_x = 0, *max_x = 0;
     *min_y = 0, *max_y = 0;
 
