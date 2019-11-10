@@ -39,9 +39,9 @@ This exercise consists in investigating and planning optimization and paralleliz
 	But still we will end up to this imbalance:
 	<br><a href="../../lecture/05_domain_decomposition.pdf#page=37"><img src="./2D-load_imbalance_domainspecific_knowledge.png" width="200"></a>
 	<!-- use html-snippet to resize the image -->
-	- Initialization: rank 0 genrates all particles
+	- Initialization: rank 0 generates all particles.
 	- Step Send: Broadcast all particles to the other ranks and set there velocity to 0.
-	(if velocity ≠ 0 than it would stack the old velocity "rank_size"-times)
+	(if velocity ≠ 0, it would stack the old velocity "rank_size"-times)
 	- Step Computation: each rank computes his part (see figure above).
 	- Step Gather: rank 0 gathers all velocitys and updates the new positions.
 	- Step Print: every nth-Step update the min-,max-xy (when updating the positions) and than print the matrix. 

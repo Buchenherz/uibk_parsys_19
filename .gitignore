@@ -4,5 +4,8 @@ venv/
 .DS_Store
 
 .idea/
+.vscode/
 
 proseminar/01/.ipynb_checkpoints/
+
+*.exe
