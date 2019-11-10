@@ -32,7 +32,19 @@ This exercise consists in investigating and planning optimization and paralleliz
 
 - Study the nature of the problem in Exercise 1, focusing on its characteristics with regard to optimization and parallelization.
 - What optimization methods can you come up with in order to improve the performance of Exercise 1?
+	- We already implemented an improved Version, because when we calculate the force from one particle to another, we add the force 180° rotated to the other particle. (so it's O(n²/2))
+	Instead of computing the rotated force for each particle new. (which leads to O(n²))
 - What parallelization strategies would you consider for Exercise 1 and why?
+	- To avoid load imbalance we iterate over the particles not over the coordinates.
+	But still we will end up to this imbalance: 
+	<a href="../../lecture/05_domain_decomposition.pdf#page=37"><img src="./2D-load_imbalance_domainspecific_knowledge.png" width="200"></a>
+	<!-- use html-snippet to resize the image -->
+	- Initialization: rank 0 genrates all particles
+	- Step Send: Broadcast all particles with velocity 0 to the other ranks.
+	(if velocity ≠ 0 than it would stack the old velocity "rank_size"-times)
+	- Step Computation: each rank computes his part (see figure above).
+	- Step Gather: rank 0 gathers all velocitys and updates the new positions.
+	- Step Print: every nth-Step update the min-,max-xy (when updating the positions) and than print the matrix. 
 
 ## General Notes
 
