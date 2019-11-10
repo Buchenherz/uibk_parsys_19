@@ -36,11 +36,11 @@ This exercise consists in investigating and planning optimization and paralleliz
 	Instead of computing the rotated force for each particle new. (which leads to O(n²))
 - What parallelization strategies would you consider for Exercise 1 and why?
 	- To avoid load imbalance we iterate over the particles not over the coordinates.
-	But still we will end up to this imbalance: 
+	But still we will end up to this imbalance:
 	<a href="../../lecture/05_domain_decomposition.pdf#page=37"><img src="./2D-load_imbalance_domainspecific_knowledge.png" width="200"></a>
 	<!-- use html-snippet to resize the image -->
 	- Initialization: rank 0 genrates all particles
-	- Step Send: Broadcast all particles with velocity 0 to the other ranks.
+	- Step Send: Broadcast all particles to the other ranks and set there velocity to 0.
 	(if velocity ≠ 0 than it would stack the old velocity "rank_size"-times)
 	- Step Computation: each rank computes his part (see figure above).
 	- Step Gather: rank 0 gathers all velocitys and updates the new positions.
