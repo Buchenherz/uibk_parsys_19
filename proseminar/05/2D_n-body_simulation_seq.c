@@ -10,7 +10,7 @@ typedef int value_t;
 #define RESOLUTION_Y 20
 
 #ifndef M_PI
-#define M_PI           3.14159265358979323846
+#define M_PI 3.14159265358979323846
 #endif
 
 // -- Matrix utilities --
@@ -67,16 +67,33 @@ int main(int argc, char **argv) {
     long long Ny = 2000;        // rows
     int particle_count = 2000;  // particles
     int max_Mass = 10000;
+    bool csv_only = true;
     clock_t clock_time;
-    bool print = true;
+    bool print = false;
     srand(time(NULL));
 
-    if (argc > 1) {
+    if (argc == 4) {
         Nx = atoi(argv[1]);
         Ny = atoi(argv[2]);
         particle_count = atoi(argv[3]);
+    } else if (argc == 3) {
+        Nx = atoi(argv[1]);
+        Ny = Nx;
+        particle_count = atoi(argv[2]);
+    } else if (argc < 4) {
+        printf("Usage: ./2D_n-body_simulation_seq Nx Ny particles\n");
+        return EXIT_FAILURE;
     }
-    int T = 50;  // (Nx < Ny ? Ny : Nx) * 500;
+
+    int T = 1000;  // (Nx < Ny ? Ny : Nx) * 500;
+
+    if (print) {
+        printf(
+            "Starting n-body simulation for Nx = %lld, Ny = %lld and "
+            "particle_count = "
+            "%d\n",
+            Nx, Ny, particle_count);
+    }
 
     clock_time = clock();
     // ---------- setup ----------
@@ -92,7 +109,7 @@ int main(int argc, char **argv) {
     long long *min_y = malloc(sizeof(long long)),
               *max_y = malloc(sizeof(long long));
 
-    // Init min / max 
+    // Init min / max
     *min_x = 0, *max_x = 0;
     *min_y = 0, *max_y = 0;
 
@@ -144,14 +161,20 @@ int main(int argc, char **argv) {
     //   break;
     // }
 
-    printf("Verification: %s\n", (success) ? "OK" : "FAILED");
+    // printf("Verification: %s\n", (success) ? "OK" : "FAILED");
 
     // ---------- cleanup ----------
 
     clock_time = clock() - clock_time;
     double time_taken = ((double)clock_time) / CLOCKS_PER_SEC;  // in seconds
-    printf("2D_n-body_simulation_seq took %f seconds to execute \n",
-           time_taken);
+    if (print) {
+        printf("2D_n-body_simulation_seq took %f seconds to execute \n",
+               time_taken);
+    } else if (csv_only) {
+        // printf( "Nx, Ny, particle_count,T, walltime, max_mass\n", Nx, Ny, particle_count, T, time_taken, max_Mass);
+        printf("%lld, %lld, %d, %d, %f, %d\n", Nx, Ny, particle_count, T,
+               time_taken, max_Mass);
+    }
 
     // free the min and max values
     free(min_x);
