@@ -12,10 +12,10 @@
 
 # Name the job. Unless you use the -o and -e options, output will
 # go to a unique file name.ojob_id for each job.
-#$ -N 2D_n-body_simulation_seq
+#$ -N D2_n-body_simulation_seq
 
 # Redirect output stream to this file. Useful for debugging, simple output, etc.
-#$ -o 2D_n-body_simulation_seq.out
+#$ -o D2_n-body_simulation_seq_06.out
 
 # Redirect error stream to this file.
 #$ -e error.dat
@@ -35,18 +35,16 @@
 # ssh session
 # load module
 module load gcc
-make
+make seq
 
-./2D_n-body_simulation_seq 10 10
-./2D_n-body_simulation_seq 100 10
-./2D_n-body_simulation_seq 1000 10
-./2D_n-body_simulation_seq 10 100
-./2D_n-body_simulation_seq 100 100
-./2D_n-body_simulation_seq 1000 100
-./2D_n-body_simulation_seq 10 1000
-./2D_n-body_simulation_seq 100 1000
-./2D_n-body_simulation_seq 1000 1000
-./2D_n-body_simulation_seq 10 10000
-./2D_n-body_simulation_seq 100 10000
-./2D_n-body_simulation_seq 1000 10000
+
+for ((i=10;i<=100;i+=10)); do
+    temp=$(($i*10));
+    ./2D_n-body_simulation_seq "$temp" "$i"
+done
+
+for ((i=2000;i<=5000;i+=1000)); do
+    temp=$(($i*10));
+    ./2D_n-body_simulation_seq 1000 "$i"
+done
 
