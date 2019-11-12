@@ -40,11 +40,16 @@ This exercise consists in investigating and planning optimization and paralleliz
 	<br><a href="../../lecture/05_domain_decomposition.pdf#page=37"><img src="./2D-load_imbalance_domainspecific_knowledge.png" width="200"></a>
 	<!-- use html-snippet to resize the image -->
 	- Initialization: rank 0 generates all particles.
-	- Step Send: Broadcast all particles to the other ranks and set there velocity to 0.
+	- Step Send: Broadcast all particles to the other ranks and set their velocity to 0.
 	(if velocity ≠ 0, it would stack the old velocity "rank_size"-times)
-	- Step Computation: each rank computes his part (see figure above).
+	- Step Computation: each rank computes its part (see figure above).
 	- Step Gather: rank 0 gathers all velocitys and updates the new positions.
-	- Step Print: every nth-Step update the min-,max-xy (when updating the positions) and than print the matrix. 
+	- Step Print: every nth-Step update the min-,max-xy (when updating the positions) and than print the matrix.
+- We will also consider using a MPI Derived Datatype to represent our Particle struct (which in itself contains other structs). This way, we are able to send and receive structs using MPI Types.
+	- Useful resources: 
+		- https://stackoverflow.com/questions/33618937/trouble-understanding-mpi-type-create-struct
+		- https://www.rookiehpc.com/mpi/docs/mpi_type_create_struct.php
+		- <a href="../../lecture/04_mpi_advanced.pdf#page=11">Lecture slides</a>
 
 ## General Notes
 
