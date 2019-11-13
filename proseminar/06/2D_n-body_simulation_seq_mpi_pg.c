@@ -160,6 +160,41 @@ int main(int argc, char **argv) {
         printf("Mass:%f\n", recv_part.mass);
     }
 
+    if (rank == 0) {
+        printf("\n---- Now sending multiple particles at once ----\n");
+        particle *P = malloc(5 * sizeof(*P));
+
+        // set up initial conditions in P
+        initParticles(P, 5, Nx, Ny, max_Mass);
+
+        // Send MPI
+        for (int i = 0; i < 5; i++) {
+            printf("[%d] The send particle has the following information:\n",
+                   i);
+            printf("Pos_x: %f, Pos_y: %f\n", P[i].pos.x, P[i].pos.y);
+            printf("Vel_x: %f, Vel_y: %f\n", P[i].vel.x, P[i].vel.y);
+            printf("Mass:%f\n", P[i].mass);
+        }
+
+        MPI_Send(P, 5, mpi_particle, 1, 42, MPI_COMM_WORLD);
+
+    } else {
+        // Receive MPI and show values
+        particle recv_part[5];
+        MPI_Recv(recv_part, 5, mpi_particle, 0, 42, MPI_COMM_WORLD,
+                 MPI_STATUS_IGNORE);
+        for (int i = 0; i < 5; i++) {
+            printf(
+                "[%d] The received particle has the following information:\n",
+                i);
+            printf("Pos_x: %f, Pos_y: %f\n", recv_part[i].pos.x,
+                   recv_part[i].pos.y);
+            printf("Vel_x: %f, Vel_y: %f\n", recv_part[i].vel.x,
+                   recv_part[i].vel.y);
+            printf("Mass:%f\n", recv_part[i].mass);
+        }
+    }
+
     // if (print) {
     //     printf("Initial:\n");
     //     printParticles(particle_count, P, min_x, min_y, &Nx, &Ny);
