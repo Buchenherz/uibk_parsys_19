@@ -67,9 +67,9 @@ int main(int argc, char **argv) {
     long long Ny = 2000;        // rows
     int particle_count = 2000;  // particles
     int max_Mass = 10000;
-    bool csv_only = true;
+    bool print_csv = false;
     clock_t clock_time;
-    bool print = false;
+    bool print = true;
     srand(time(NULL));
 
     if (argc == 4) {
@@ -170,8 +170,9 @@ int main(int argc, char **argv) {
     if (print) {
         printf("2D_n-body_simulation_seq took %f seconds to execute \n",
                time_taken);
-    } else if (csv_only) {
-        // printf( "Nx, Ny, particle_count,T, walltime, max_mass\n", Nx, Ny, particle_count, T, time_taken, max_Mass);
+    } else if (print_csv) {
+        // printf( "Nx, Ny, particle_count,T, walltime, max_mass\n", Nx, Ny,
+        // particle_count, T, time_taken, max_Mass);
         printf("%lld, %lld, %d, %d, %f, %d\n", Nx, Ny, particle_count, T,
                time_taken, max_Mass);
     }
