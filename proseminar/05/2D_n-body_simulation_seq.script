@@ -15,7 +15,7 @@
 #$ -N D2_n-body_simulation_seq
 
 # Redirect output stream to this file. Useful for debugging, simple output, etc.
-#$ -o D2_n-body_simulation_seq_06.out
+#$ -o D2_n-body_simulation_seq.out
 
 # Redirect error stream to this file.
 #$ -e error.dat
