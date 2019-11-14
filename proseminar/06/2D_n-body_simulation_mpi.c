@@ -181,11 +181,11 @@ int main(int argc, char **argv) {
             &P[0], local_particle_count, mpi_particle, MPI_COMM_WORLD);
         // show intermediate step
         if (!(t % 5) && print) {
-            printf("min_x = %lld, max_x = %lld, min_y = %lld, max_y = %lld",*min_x,*max_x,*min_y,*max_y);
-            // MPI_Reduce(MPI_IN_PLACE, min_x, 1, MPI_LONG_LONG, MPI_MIN, 0, MPI_COMM_WORLD);
-            // MPI_Reduce(MPI_IN_PLACE, max_x, 1, MPI_LONG_LONG, MPI_MAX, 0, MPI_COMM_WORLD);
-            // MPI_Reduce(MPI_IN_PLACE, min_y, 1, MPI_LONG_LONG, MPI_MIN, 0, MPI_COMM_WORLD);
-            // MPI_Reduce(MPI_IN_PLACE, max_y, 1, MPI_LONG_LONG, MPI_MAX, 0, MPI_COMM_WORLD);
+            // printf("min_x = %lld, max_x = %lld, min_y = %lld, max_y = %lld",*min_x,*max_x,*min_y,*max_y);
+            MPI_Reduce(MPI_IN_PLACE, &min_x[0], 1, MPI_LONG_LONG, MPI_MIN, 0, MPI_COMM_WORLD);
+            MPI_Reduce(MPI_IN_PLACE, &max_x[0], 1, MPI_LONG_LONG, MPI_MAX, 0, MPI_COMM_WORLD);
+            MPI_Reduce(MPI_IN_PLACE, &min_y[0], 1, MPI_LONG_LONG, MPI_MIN, 0, MPI_COMM_WORLD);
+            MPI_Reduce(MPI_IN_PLACE, &max_y[0], 1, MPI_LONG_LONG, MPI_MAX, 0, MPI_COMM_WORLD);
             if (rank == 0) {
                 printf("Step t=%d:\n", t);
                 printParticles(particle_count, P, min_x, min_y, max_x, max_y);
