@@ -1,9 +1,9 @@
 #include <math.h>
+#include <mpi.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include <mpi.h>
 
 typedef int value_t;
 
@@ -88,25 +88,16 @@ int main(int argc, char **argv) {
 
     int T = 50;  // (Nx < Ny ? Ny : Nx) * 500;
 
-    if (print) {
-        printf(
-            "Starting n-body simulation for Nx = %lld, Ny = %lld and "
-            "particle_count = "
-            "%d\n",
-            Nx, Ny, particle_count);
-    }
-
-    // MPI INIT
+    // #region MPI INIT
+    MPI_Init(&argc, &argv);  // initialize the MPI environment
     int number_of_ranks;
     int rank;
-
-    MPI_Init(&argc, &argv);  // initialize the MPI environment
     MPI_Comm_size(MPI_COMM_WORLD, &number_of_ranks);  // get the number of ranks
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);  // get the rankof the caller
 
-    // END MPI INIT
+    // #endregion
 
-    // Set up MPI Type Structs
+    // #region Set up MPI Type Structs
     MPI_Datatype mpi_pos;
     int pos_blocklengths[2] = {1, 1};
     MPI_Aint pos_displacements[2] = {offsetof(struct position, x),
@@ -134,58 +125,93 @@ int main(int argc, char **argv) {
     MPI_Type_create_struct(3, part_blocklengths, part_displacements,
                            part_datatypes, &mpi_particle);
     MPI_Type_commit(&mpi_particle);
-    // End set up MPI type structs
-
+    // #endregion
     clock_time = clock();
     // ---------- setup ----------
 
     particle *P = malloc(particle_count * sizeof(*P));
 
+    if (print && rank == 0) {
+        printf(
+            "Starting n-body simulation for Nx = %lld, Ny = %lld and "
+            "particle_count = "
+            "%d\n",
+            Nx, Ny, particle_count);
+    }
+
     if (rank == 0) {
         // set up initial conditions in P
         initParticles(P, particle_count, Nx, Ny, max_Mass);
     }
-    MPI_Bcast(&P, particle_count, mpi_particle, 0, MPI_COMM_WORLD);
+
+    MPI_Bcast(&P[0], particle_count, mpi_particle, 0, MPI_COMM_WORLD);
 
     // allocate min / max values for future print scale
     long long *min_x = malloc(sizeof(long long)),
-              *max_x = malloc(sizeof(long long));
-    long long *min_y = malloc(sizeof(long long)),
+              *max_x = malloc(sizeof(long long)),
+              *min_y = malloc(sizeof(long long)),
               *max_y = malloc(sizeof(long long));
 
     // Init min / max
     *min_x = 0, *max_x = 0;
     *min_y = 0, *max_y = 0;
 
-    if (print && (rank == 0)) {
+    if (print && rank == 0) {
         printf("Initial:\n");
         printParticles(particle_count, P, min_x, min_y, &Nx, &Ny);
         printf("\n");
     }
-
     // ---------- compute ----------
 
     int local_particle_count = particle_count / number_of_ranks;
     // for each time step ..
     for (int t = 0; t < T; t++) {
+        // printf("lpc: %d, rank: %d\n", local_particle_count, rank);
         // Set min / max to 0 to minimize the print size - if the outest
         // particles move closer to the center
         *min_x = 0, *max_x = 0;
         *min_y = 0, *max_y = 0;
         // .. we propagate the positions
-        for (int i = local_particle_count * rank; i < local_particle_count * (rank + 1); i++) {
+        particle sbuf[local_particle_count];
+        int j = 0;
+        for (int i = local_particle_count * rank;
+             i < local_particle_count * (rank + 1); i++) {
             calculateParticleForces(P, i, local_particle_count);
             updateParticlePositions(P, i, min_x, max_x, min_y, max_y);
+            sbuf[j] = P[i];
+
+            j++;
         }
-        MPI_Allgather(&P[local_particle_count * rank], local_particle_count, mpi_particle,
-            &P[0], local_particle_count, mpi_particle, MPI_COMM_WORLD);
+
+        particle rbuf[local_particle_count];
+        MPI_Allgather(&sbuf, local_particle_count, mpi_particle, &P[0],
+                      local_particle_count, mpi_particle, MPI_COMM_WORLD);
+
         // show intermediate step
-        if (!(t % 5) && print) {
-            // printf("min_x = %lld, max_x = %lld, min_y = %lld, max_y = %lld",*min_x,*max_x,*min_y,*max_y);
-            MPI_Reduce(MPI_IN_PLACE, &min_x[0], 1, MPI_LONG_LONG, MPI_MIN, 0, MPI_COMM_WORLD);
-            MPI_Reduce(MPI_IN_PLACE, &max_x[0], 1, MPI_LONG_LONG, MPI_MAX, 0, MPI_COMM_WORLD);
-            MPI_Reduce(MPI_IN_PLACE, &min_y[0], 1, MPI_LONG_LONG, MPI_MIN, 0, MPI_COMM_WORLD);
-            MPI_Reduce(MPI_IN_PLACE, &max_y[0], 1, MPI_LONG_LONG, MPI_MAX, 0, MPI_COMM_WORLD);
+        if (!(t % 1) && print) {
+            // printf("min_x = %lld, max_x = %lld, min_y = %lld, max_y =
+            // %lld",
+            //        *min_x, *max_x, *min_y, *max_y);
+            if (rank == 0) {
+                // https://stackoverflow.com/questions/17741574/in-place-mpi-reduce-crashes-with-openmpi
+                MPI_Reduce(MPI_IN_PLACE, min_x, 1, MPI_LONG_LONG, MPI_MIN, 0,
+                           MPI_COMM_WORLD);
+                MPI_Reduce(MPI_IN_PLACE, max_x, 1, MPI_LONG_LONG, MPI_MAX, 0,
+                           MPI_COMM_WORLD);
+                MPI_Reduce(MPI_IN_PLACE, min_y, 1, MPI_LONG_LONG, MPI_MIN, 0,
+                           MPI_COMM_WORLD);
+                MPI_Reduce(MPI_IN_PLACE, max_y, 1, MPI_LONG_LONG, MPI_MAX, 0,
+                           MPI_COMM_WORLD);
+            } else {
+                MPI_Reduce(min_x, min_x, 1, MPI_LONG_LONG, MPI_MIN, 0,
+                           MPI_COMM_WORLD);
+                MPI_Reduce(max_x, max_x, 1, MPI_LONG_LONG, MPI_MAX, 0,
+                           MPI_COMM_WORLD);
+                MPI_Reduce(min_y, min_y, 1, MPI_LONG_LONG, MPI_MIN, 0,
+                           MPI_COMM_WORLD);
+                MPI_Reduce(max_y, max_y, 1, MPI_LONG_LONG, MPI_MAX, 0,
+                           MPI_COMM_WORLD);
+            }
             if (rank == 0) {
                 printf("Step t=%d:\n", t);
                 printParticles(particle_count, P, min_x, min_y, max_x, max_y);
@@ -195,7 +221,7 @@ int main(int argc, char **argv) {
     }
 
     // ---------- check ----------
-    if (print) {
+    if (print && rank == 0) {
         printf("Final:\n");
         printParticles(particle_count, P, min_x, min_y, max_x, max_y);
         printf("minx: %lld, miny: %lld\n", *min_x, *min_y);
@@ -234,8 +260,15 @@ int main(int argc, char **argv) {
     free(max_x);
     free(min_y);
     free(max_y);
+
     // Free the Particle array
     free(P);
+
+    // Finalise MPI
+    MPI_Type_free(&mpi_particle);
+    MPI_Type_free(&mpi_pos);
+    MPI_Type_free(&mpi_vel);
+    MPI_Finalize();
 
     // done
     return (success) ? EXIT_SUCCESS : EXIT_FAILURE;

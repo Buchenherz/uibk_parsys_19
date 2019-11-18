@@ -15,7 +15,7 @@
 #$ -N D2_n-body_simulation_mpi
 
 # Redirect output stream to this file. Useful for debugging, simple output, etc.
-#$ -o D2_n-body_simulation_mpi.out
+#$ -o D2_n-body_simulation_mpi_val.out
 
 # Redirect error stream to this file.
 #$ -e error.dat
@@ -37,6 +37,6 @@
 module load openmpi/4.0.1
 module load gcc
 
-mpicc -O2 -std=c99 -Wall -Wextra -pedantic 2D_n-body_simulation_mpi.c -o 2D_n-body_simulation_mpi.o -lm
+mpicc -O0 -std=c99 -Wall -Wextra -pedantic 2D_n-body_simulation_mpi.c -o 2D_n-body_simulation_mpi.o -lm
 
-./2D_n-body_simulation_mpi.o 100 100
+mpiexec -n 2 valgrind --leak-check=yes --log-file=vg.%p ./2D_n-body_simulation_mpi.o 10 10 10
