@@ -86,7 +86,7 @@ int main(int argc, char **argv) {
         return EXIT_FAILURE;
     }
 
-    int T = 50;  // (Nx < Ny ? Ny : Nx) * 500;
+    int T = 5000;  // (Nx < Ny ? Ny : Nx) * 500;
 
     // #region MPI INIT
     MPI_Init(&argc, &argv);  // initialize the MPI environment
@@ -188,7 +188,7 @@ int main(int argc, char **argv) {
                       local_particle_count, mpi_particle, MPI_COMM_WORLD);
 
         // show intermediate step
-        if (!(t % 1) && print) {
+        if (!(t % 100) && print) {
             // printf("min_x = %lld, max_x = %lld, min_y = %lld, max_y =
             // %lld",
             //        *min_x, *max_x, *min_y, *max_y);
@@ -226,7 +226,11 @@ int main(int argc, char **argv) {
         printParticles(particle_count, P, min_x, min_y, max_x, max_y);
         printf("minx: %lld, miny: %lld\n", *min_x, *min_y);
         printf("maxx: %lld, maxy: %lld\n", *max_x, *max_y);
-        printf("\n");
+        printf(
+            "END - No.Ranks: %d, Timesteps: %d, particle_count: %d, x: %lld, "
+            "y: "
+            "%lld\n",
+            number_of_ranks, T, particle_count, Nx, Ny);
     }
 
     int success = true;
@@ -245,7 +249,7 @@ int main(int argc, char **argv) {
 
     clock_time = clock() - clock_time;
     double time_taken = ((double)clock_time) / CLOCKS_PER_SEC;  // in seconds
-    if (print) {
+    if (print && rank == 0) {
         printf("2D_n-body_simulation_seq took %f seconds to execute \n",
                time_taken);
     } else if (print_csv) {
