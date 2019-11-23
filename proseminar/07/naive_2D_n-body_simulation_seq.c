@@ -130,17 +130,20 @@ int main(int argc, char **argv) {
         *min_y = 0, *max_y = 0;
 
         // .. we propagate the positions
-#pragma omp parallel for num_threads(4)
+        double start = omp_get_wtime();
+        omp_set_num_threads(4);
+#pragma omp parallel for schedule(dynamic)
         for (int i = 0; i < particle_count; i++) {
             // printf("%d\n ", omp_get_thread_num());
             calculateParticleForces(P, i, particle_count);
+        }
+
+#pragma omp parallel for schedule(dynamic)
+        for (int i = 0; i < particle_count; i++) {
             updateParticlePositions(P, i, min_x, max_x, min_y, max_y);
         }
-        printf("\n----\n");
-        for (size_t i = 0; i < particle_count; i++) {
-            printf("%d %d %d", P[i].pos.x, P[i].pos.y, P[i].mass);
-        }
-        printf("\n----\n");
+        double end = omp_get_wtime();
+        printf("Total time for iteration %d: %.16g\n", t, end - start);
 
         // show intermediate step
         if (!(t % 5) && print) {
@@ -158,6 +161,11 @@ int main(int argc, char **argv) {
         printf("maxx: %lld, maxy: %lld\n", *max_x, *max_y);
         printf("\n");
     }
+    printf("\n--FINAL POSITIONS OF PARTICLES--\n");
+    for (size_t i = 0; i < particle_count; i++) {
+        printf("%d %d", P[i].pos.x, P[i].pos.y);
+    }
+    printf("\n----\n");
 
     int success = true;
     // TODO validation ???
@@ -287,7 +295,8 @@ void initParticles(particle *P, int particle_count, long long Nx, long long Ny,
             Nx / 10 * normalRandom() + Nx / 2;  // float in range 0 to Nx;
         P[i].pos.y =
             Ny / 10 * normalRandom() + Ny / 2;  // float in range 0 to Ny;
-        P[i].mass = max_Mass * rand_gen() + 1;  // float in range 1 to max_Mass;
+        P[i].mass =
+            1;  // max_Mass * rand_gen() + 1;  // float in range 1 to max_Mass;
         P[i].vel.x = 0;
         P[i].vel.y = 0;
     }
@@ -322,16 +331,13 @@ void calculateParticleForces(particle *P, int i, int particle_count) {
 void updateParticlePositions(particle *P, int i, long long *min_x,
                              long long *max_x, long long *min_y,
                              long long *max_y) {
-#pragma omp barrier
-    {
-        P[i].pos.x += P[i].vel.x;
-        P[i].pos.y += P[i].vel.y;
+    P[i].pos.x += P[i].vel.x;
+    P[i].pos.y += P[i].vel.y;
 
-        // Check and set new minimum and maximum values for future
-        // print scaling
-        *min_x = MIN((long long)P[i].pos.x, *min_x);
-        *max_x = MAX((long long)P[i].pos.x, *max_x);
-        *min_y = MIN((long long)P[i].pos.y, *min_y);
-        *max_y = MAX((long long)P[i].pos.y, *max_y);
-    }
+    // Check and set new minimum and maximum values for future
+    // print scaling
+    *min_x = MIN((long long)P[i].pos.x, *min_x);
+    *max_x = MAX((long long)P[i].pos.x, *max_x);
+    *min_y = MIN((long long)P[i].pos.y, *min_y);
+    *max_y = MAX((long long)P[i].pos.y, *max_y);
 }
