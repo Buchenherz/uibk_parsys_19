@@ -86,7 +86,7 @@ int main(int argc, char **argv) {
         return EXIT_FAILURE;
     }
 
-    int T = 1;  // (Nx < Ny ? Ny : Nx) * 500;
+    int T = 50;  // (Nx < Ny ? Ny : Nx) * 500;
 
     if (print) {
         printf(
@@ -130,11 +130,17 @@ int main(int argc, char **argv) {
         *min_y = 0, *max_y = 0;
 
         // .. we propagate the positions
+#pragma omp parallel for num_threads(4)
         for (int i = 0; i < particle_count; i++) {
             // printf("%d\n ", omp_get_thread_num());
             calculateParticleForces(P, i, particle_count);
             updateParticlePositions(P, i, min_x, max_x, min_y, max_y);
         }
+        printf("\n----\n");
+        for (size_t i = 0; i < particle_count; i++) {
+            printf("%d %d %d", P[i].pos.x, P[i].pos.y, P[i].mass);
+        }
+        printf("\n----\n");
 
         // show intermediate step
         if (!(t % 5) && print) {
@@ -288,7 +294,6 @@ void initParticles(particle *P, int particle_count, long long Nx, long long Ny,
 }
 
 void calculateParticleForces(particle *P, int i, int particle_count) {
-#pragma omp parallel for num_threads(4)
     for (int j = 0; j < particle_count; j++) {
         if (i == j) {
             continue;
@@ -317,13 +322,16 @@ void calculateParticleForces(particle *P, int i, int particle_count) {
 void updateParticlePositions(particle *P, int i, long long *min_x,
                              long long *max_x, long long *min_y,
                              long long *max_y) {
-    P[i].pos.x += P[i].vel.x;
-    P[i].pos.y += P[i].vel.y;
+#pragma omp barrier
+    {
+        P[i].pos.x += P[i].vel.x;
+        P[i].pos.y += P[i].vel.y;
 
-    // Check and set new minimum and maximum values for future
-    // print scaling
-    *min_x = MIN((long long)P[i].pos.x, *min_x);
-    *max_x = MAX((long long)P[i].pos.x, *max_x);
-    *min_y = MIN((long long)P[i].pos.y, *min_y);
-    *max_y = MAX((long long)P[i].pos.y, *max_y);
+        // Check and set new minimum and maximum values for future
+        // print scaling
+        *min_x = MIN((long long)P[i].pos.x, *min_x);
+        *max_x = MAX((long long)P[i].pos.x, *max_x);
+        *min_y = MIN((long long)P[i].pos.y, *min_y);
+        *max_y = MAX((long long)P[i].pos.y, *max_y);
+    }
 }
