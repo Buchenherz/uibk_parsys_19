@@ -10,6 +10,8 @@ The goal of this assignment is to parallelize the sequential implementation of t
 - Measure the execution time of your OpenMP program for several problem sizes and for 1 to 8 threads.
 - Illustrate the data in appropriate speedup/efficiency figures and discuss them. What can you observe?
 
+- https://www.youtube.com/watch?v=jdYHVeh2wEI&list=PLLX-Q6B8xqZ8n8bwjGdzBJ25X2utwnoEG&index=10 I guess we would use dynamic for schedule
+
 ## General Notes
 
 All the material required by the tasks above (e.g. code, figures, etc...) must be part of the solution that is handed in. Your experiments should be reproducible and comparable to your own measurements using the solution materials that you hand in. For source code, please provide a makefile or other, intuitive means of compiling with the required flags and settings.
