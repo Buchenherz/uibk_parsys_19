@@ -134,14 +134,18 @@ int main(int argc, char **argv) {
 
         // .. we propagate the positions
         double start = omp_get_wtime();
+
+        omp_set_num_threads(4);
+#pragma omp parallel for schedule(static, 1)
+        // https://software.intel.com/en-us/articles/openmp-loop-scheduling
         for (int i = 0; i < particle_count; i++) {
-            // printf("%d\n ", omp_get_thread_num());
             calculateParticleForces(P, i, particle_count);
         }
 
         for (int i = 0; i < particle_count; i++) {
             updateParticlePositions(P, i, min_x, max_x, min_y, max_y);
         }
+
         double end = omp_get_wtime();
         printf("Total time for iteration %d: %.16g\n", t, end - start);
 
@@ -294,33 +298,41 @@ void initParticles(particle *P, int particle_count, long long Nx, long long Ny,
 }
 
 void calculateParticleForces(particle *P, int i, int particle_count) {
-    omp_set_num_threads(4);
-#pragma omp parallel for schedule(dynamic)
     for (int j = 0; j < particle_count; j++) {
         if (i == j) {
             continue;
         }
-        float deltaX = P[j].pos.x - P[i].pos.x;
-        float deltaY = P[j].pos.y - P[i].pos.y;
+
+        double deltaX, deltaY, force, old_vel_x, old_vel_y, j_pos_x, j_pos_y,
+            i_pos_x, i_pos_y;
+
+        j_pos_x = P[j].pos.x;
+
+        j_pos_y = P[j].pos.y;
+
+        i_pos_x = P[i].pos.x;
+
+        i_pos_y = P[i].pos.y;
+
+        deltaX = j_pos_x - i_pos_x;
+        deltaY = j_pos_y - i_pos_y;
 
         // c² = a² + b² , no abs needed - square makes it positive
         double square_radius = pow(deltaX, 2) + pow(deltaY, 2);
-        double force = (P[i].mass * P[j].mass) / square_radius;
+        force = (P[i].mass * P[j].mass) / square_radius;
 
         // https://stackoverflow.com/questions/39818833/moving-an-object-from-one-point-to-another
         // calculate angle
         float angle = atan2(deltaY, deltaX);
-        double old_vel_x, old_vel_y;
 
-        // When using atomics, this gets waaaay faster (from .5 per iteration
-        // down to .1)
-#pragma omp atomic read
         old_vel_x = P[i].vel.x;
-#pragma omp atomic read
         old_vel_y = P[i].vel.y;
 
         double new_vel_x = old_vel_x + (force / P[i].mass) * cos(angle);
         double new_vel_y = old_vel_y + (force / P[i].mass) * sin(angle);
+
+        // When using atomics, this gets waaaay faster (from .5 per iteration
+        // down to .1)
 #pragma omp atomic write
         P[i].vel.x = new_vel_x;
 #pragma omp atomic write
