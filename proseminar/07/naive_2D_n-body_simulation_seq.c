@@ -70,6 +70,7 @@ int main(int argc, char **argv) {
     int max_Mass = 10;
     bool print_csv = false;
     clock_t clock_time;
+
     bool print = true;
     srand(111);
 
@@ -97,6 +98,8 @@ int main(int argc, char **argv) {
     }
 
     clock_time = clock();
+    double omp_start_time = omp_get_wtime();
+
     // ---------- setup ----------
 
     particle *P = malloc(particle_count * sizeof(*P));
@@ -131,8 +134,6 @@ int main(int argc, char **argv) {
 
         // .. we propagate the positions
         double start = omp_get_wtime();
-        omp_set_num_threads(8);
-#pragma omp parallel for schedule(dynamic)
         for (int i = 0; i < particle_count; i++) {
             // printf("%d\n ", omp_get_thread_num());
             calculateParticleForces(P, i, particle_count);
@@ -167,24 +168,15 @@ int main(int argc, char **argv) {
     printf("\n----\n");
 
     int success = true;
-    // TODO validation ???
-    // for (long long i = 0; i < particle_count; i++)
-    // {
-    //   if (?)
-    //     continue;
-    //   success = 0;
-    //   break;
-    // }
-
-    // printf("Verification: %s\n", (success) ? "OK" : "FAILED");
 
     // ---------- cleanup ----------
 
     clock_time = clock() - clock_time;
+    double omp_end_time = omp_get_wtime();
     double time_taken = ((double)clock_time) / CLOCKS_PER_SEC;  // in seconds
     if (print) {
-        printf("2D_n-body_simulation_seq took %f seconds to execute \n",
-               time_taken);
+        printf("Total time for program execution: %.16g\n",
+               omp_end_time - omp_start_time);
     } else if (print_csv) {
         // printf( "Nx, Ny, particle_count,T, walltime, max_mass\n", Nx, Ny,
         // particle_count, T, time_taken, max_Mass);
@@ -302,6 +294,8 @@ void initParticles(particle *P, int particle_count, long long Nx, long long Ny,
 }
 
 void calculateParticleForces(particle *P, int i, int particle_count) {
+    omp_set_num_threads(4);
+#pragma omp parallel for schedule(dynamic)
     for (int j = 0; j < particle_count; j++) {
         if (i == j) {
             continue;
@@ -316,11 +310,21 @@ void calculateParticleForces(particle *P, int i, int particle_count) {
         // https://stackoverflow.com/questions/39818833/moving-an-object-from-one-point-to-another
         // calculate angle
         float angle = atan2(deltaY, deltaX);
+        double old_vel_x, old_vel_y;
 
-        // When this is not critical, runtime is reduced a lot, final positions
-        // are equal but display is different...
-        P[i].vel.x += (force / P[i].mass) * cos(angle);
-        P[i].vel.y += (force / P[i].mass) * sin(angle);
+        // When using atomics, this gets waaaay faster (from .5 per iteration
+        // down to .1)
+#pragma omp atomic read
+        old_vel_x = P[i].vel.x;
+#pragma omp atomic read
+        old_vel_y = P[i].vel.y;
+
+        double new_vel_x = old_vel_x + (force / P[i].mass) * cos(angle);
+        double new_vel_y = old_vel_y + (force / P[i].mass) * sin(angle);
+#pragma omp atomic write
+        P[i].vel.x = new_vel_x;
+#pragma omp atomic write
+        P[i].vel.y = new_vel_y;
 
         // P[j].vel.x += (force / P[j].mass) * cos(angle + M_PI);
         // P[j].vel.y += (force / P[j].mass) * sin(angle + M_PI);
