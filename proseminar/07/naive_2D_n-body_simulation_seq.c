@@ -103,10 +103,11 @@ int main(int argc, char **argv) {
     }
 
     int T = 50;  // (Nx < Ny ? Ny : Nx) * 500;
-
+    double iteration_times_array[T];
 #ifdef DEBUG
     printf(
-        "Starting n-body simulation for Nx = %lld, Ny = %lld, no_of_threads = "
+        "Starting n-body simulation for Nx = %lld, Ny = %lld, "
+        "no_of_threads = "
         "%d, timesteps = %d and "
         "particle_count = "
         "%d\n",
@@ -148,7 +149,7 @@ int main(int argc, char **argv) {
         *min_y = 0, *max_y = 0;
 
         // .. we propagate the positions
-        double start = omp_get_wtime();
+        double iteration_start_time = omp_get_wtime();
 
         omp_set_num_threads(number_of_threads);
 #pragma omp parallel for schedule(static, 1)
@@ -161,7 +162,8 @@ int main(int argc, char **argv) {
         for (int i = 0; i < particle_count; i++) {
             updateParticlePositions(P, i, min_x, max_x, min_y, max_y);
         }
-        double end = omp_get_wtime();
+        double iteration_end_time = omp_get_wtime();
+        iteration_times_array[t] = iteration_end_time - iteration_start_time;
 
 #ifdef DEBUG
         printf("Total time for iteration %d: %.16g\n", t, end - start);
@@ -193,14 +195,20 @@ int main(int argc, char **argv) {
 #endif
 
     double omp_end_time = omp_get_wtime();
+    double iteration_avg = 0.0;
+    for (int t = 0; t < T; t++) {
+        iteration_avg += iteration_times_array[t];
+    }
+    iteration_avg /= (double)T;
 
 #ifdef PRINT
     printf("Total time for program execution: %.16g\n",
            omp_end_time - omp_start_time);
 #endif
 #ifdef CSV
-    printf("%lld, %lld, %d, %d, %f, %d, %d\n", Nx, Ny, particle_count, T,
-           omp_end_time - omp_start_time, max_Mass, number_of_threads);
+    printf("%lld, %lld, %d, %d, %f, %f, %d, %d\n", Nx, Ny, particle_count, T,
+           omp_end_time - omp_start_time, iteration_avg, max_Mass,
+           number_of_threads);
 #endif
 
     // ---------- cleanup ----------
