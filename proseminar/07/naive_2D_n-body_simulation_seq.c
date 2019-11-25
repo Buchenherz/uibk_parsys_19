@@ -9,7 +9,6 @@ typedef int value_t;
 
 #define RESOLUTION_X 100
 #define RESOLUTION_Y 20
-#define NUMBER_OF_THREADS 4
 
 // IFDEFS
 // #define DEBUG
@@ -76,11 +75,6 @@ int main(int argc, char **argv) {
 
     int max_Mass = 1;
 
-    bool print_csv = false;
-    clock_t clock_time;
-
-    bool print = true;
-
 #ifdef DEBUG
     // Fixed random generator for debug purposes
     srand(111);
@@ -88,7 +82,13 @@ int main(int argc, char **argv) {
     srand(time(NULL));
 #endif
 
-    if (argc == 4) {
+    int number_of_threads = 4;
+    if (argc == 5) {
+        Nx = atoi(argv[1]);
+        Ny = atoi(argv[2]);
+        particle_count = atoi(argv[3]);
+        number_of_threads = atoi(argv[4]);
+    } else if (argc == 4) {
         Nx = atoi(argv[1]);
         Ny = atoi(argv[2]);
         particle_count = atoi(argv[3]);
@@ -97,7 +97,8 @@ int main(int argc, char **argv) {
         Ny = Nx;
         particle_count = atoi(argv[2]);
     } else if (argc < 4) {
-        printf("Usage: ./2D_n-body_simulation_seq Nx Ny particles\n");
+        printf(
+            "Usage: ./2D_n-body_simulation_seq Nx Ny particles num_threads\n");
         return EXIT_FAILURE;
     }
 
@@ -109,7 +110,7 @@ int main(int argc, char **argv) {
         "%d, timesteps = %d and "
         "particle_count = "
         "%d\n",
-        Nx, Ny, NUMBER_OF_THREADS, T, particle_count);
+        Nx, Ny, number_of_threads, T, particle_count);
 #endif
 
     double omp_start_time = omp_get_wtime();
@@ -149,7 +150,7 @@ int main(int argc, char **argv) {
         // .. we propagate the positions
         double start = omp_get_wtime();
 
-        omp_set_num_threads(NUMBER_OF_THREADS);
+        omp_set_num_threads(number_of_threads);
 #pragma omp parallel for schedule(static, 1)
         // https://software.intel.com/en-us/articles/openmp-loop-scheduling
         // http://ppc.cs.aalto.fi/ch3/schedule/
@@ -160,8 +161,8 @@ int main(int argc, char **argv) {
         for (int i = 0; i < particle_count; i++) {
             updateParticlePositions(P, i, min_x, max_x, min_y, max_y);
         }
-
         double end = omp_get_wtime();
+
 #ifdef DEBUG
         printf("Total time for iteration %d: %.16g\n", t, end - start);
 #endif
@@ -199,7 +200,7 @@ int main(int argc, char **argv) {
 #endif
 #ifdef CSV
     printf("%lld, %lld, %d, %d, %f, %d, %d\n", Nx, Ny, particle_count, T,
-           omp_end_time - omp_start_time, max_Mass, NUMBER_OF_THREADS);
+           omp_end_time - omp_start_time, max_Mass, number_of_threads);
 #endif
 
     // ---------- cleanup ----------
@@ -305,8 +306,7 @@ void initParticles(particle *P, int particle_count, long long Nx, long long Ny,
             Nx / 10 * normalRandom() + Nx / 2;  // float in range 0 to Nx;
         P[i].pos.y =
             Ny / 10 * normalRandom() + Ny / 2;  // float in range 0 to Ny;
-        P[i].mass =
-            1;  // max_Mass * rand_gen() + 1;  // float in range 1 to max_Mass;
+        P[i].mass = max_Mass * rand_gen() + 1;  // float in range 1 to max_Mass;
         P[i].vel.x = 0;
         P[i].vel.y = 0;
     }
