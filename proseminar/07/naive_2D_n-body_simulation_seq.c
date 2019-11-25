@@ -132,12 +132,12 @@ int main(int argc, char **argv) {
         // .. we propagate the positions
         double start = omp_get_wtime();
         omp_set_num_threads(8);
+#pragma omp parallel for schedule(dynamic)
         for (int i = 0; i < particle_count; i++) {
             // printf("%d\n ", omp_get_thread_num());
             calculateParticleForces(P, i, particle_count);
         }
 
-#pragma omp parallel for schedule(dynamic)
         for (int i = 0; i < particle_count; i++) {
             updateParticlePositions(P, i, min_x, max_x, min_y, max_y);
         }
@@ -317,6 +317,8 @@ void calculateParticleForces(particle *P, int i, int particle_count) {
         // calculate angle
         float angle = atan2(deltaY, deltaX);
 
+        // When this is not critical, runtime is reduced a lot, final positions
+        // are equal but display is different...
         P[i].vel.x += (force / P[i].mass) * cos(angle);
         P[i].vel.y += (force / P[i].mass) * sin(angle);
 
