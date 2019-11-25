@@ -9,6 +9,12 @@ typedef int value_t;
 
 #define RESOLUTION_X 100
 #define RESOLUTION_Y 20
+#define NUMBER_OF_THREADS 4
+
+// IFDEFS
+// #define DEBUG
+// #define PRINT
+#define CSV
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
@@ -67,12 +73,20 @@ int main(int argc, char **argv) {
     long long Nx = 2000;        // columns
     long long Ny = 2000;        // rows
     int particle_count = 2000;  // particles
-    int max_Mass = 10;
+
+    int max_Mass = 1;
+
     bool print_csv = false;
     clock_t clock_time;
 
     bool print = true;
+
+#ifdef DEBUG
+    // Fixed random generator for debug purposes
     srand(111);
+#else
+    srand(time(NULL));
+#endif
 
     if (argc == 4) {
         Nx = atoi(argv[1]);
@@ -89,15 +103,15 @@ int main(int argc, char **argv) {
 
     int T = 50;  // (Nx < Ny ? Ny : Nx) * 500;
 
-    if (print) {
-        printf(
-            "Starting n-body simulation for Nx = %lld, Ny = %lld and "
-            "particle_count = "
-            "%d\n",
-            Nx, Ny, particle_count);
-    }
+#ifdef DEBUG
+    printf(
+        "Starting n-body simulation for Nx = %lld, Ny = %lld, no_of_threads = "
+        "%d, timesteps = %d and "
+        "particle_count = "
+        "%d\n",
+        Nx, Ny, NUMBER_OF_THREADS, T, particle_count);
+#endif
 
-    clock_time = clock();
     double omp_start_time = omp_get_wtime();
 
     // ---------- setup ----------
@@ -117,11 +131,11 @@ int main(int argc, char **argv) {
     *min_x = 0, *max_x = 0;
     *min_y = 0, *max_y = 0;
 
-    if (print) {
-        printf("Initial:\n");
-        printParticles(particle_count, P, min_x, min_y, &Nx, &Ny);
-        printf("\n");
-    }
+#ifdef PRINT
+    printf("Initial:\n");
+    printParticles(particle_count, P, min_x, min_y, &Nx, &Ny);
+    printf("\n");
+#endif
 
     // ---------- compute ----------
 
@@ -135,9 +149,10 @@ int main(int argc, char **argv) {
         // .. we propagate the positions
         double start = omp_get_wtime();
 
-        omp_set_num_threads(4);
+        omp_set_num_threads(NUMBER_OF_THREADS);
 #pragma omp parallel for schedule(static, 1)
         // https://software.intel.com/en-us/articles/openmp-loop-scheduling
+        // http://ppc.cs.aalto.fi/ch3/schedule/
         for (int i = 0; i < particle_count; i++) {
             calculateParticleForces(P, i, particle_count);
         }
@@ -147,47 +162,47 @@ int main(int argc, char **argv) {
         }
 
         double end = omp_get_wtime();
+#ifdef DEBUG
         printf("Total time for iteration %d: %.16g\n", t, end - start);
-
+#endif
         // show intermediate step
-        if (!(t % 5) && print) {
+        if (!(t % 5)) {
+#ifdef PRINT
             printf("Step t=%d:\n", t);
             printParticles(particle_count, P, min_x, min_y, max_x, max_y);
             printf("\n");
+#endif
         }
     }
 
     // ---------- check ----------
-    if (print) {
-        printf("Final:\n");
-        printParticles(particle_count, P, min_x, min_y, max_x, max_y);
-        printf("minx: %lld, miny: %lld\n", *min_x, *min_y);
-        printf("maxx: %lld, maxy: %lld\n", *max_x, *max_y);
-        printf("\n");
-    }
+#ifdef PRINT
+    printf("Final:\n");
+    printParticles(particle_count, P, min_x, min_y, max_x, max_y);
+    printf("minx: %lld, miny: %lld\n", *min_x, *min_y);
+    printf("maxx: %lld, maxy: %lld\n", *max_x, *max_y);
+    printf("\n");
+#endif
+#ifdef DEBUG
     printf("\n--FINAL POSITIONS OF PARTICLES--\n");
     for (int i = 0; i < particle_count; i++) {
         printf("%f %f ", P[i].pos.x, P[i].pos.y);
     }
     printf("\n----\n");
+#endif
 
-    int success = true;
+    double omp_end_time = omp_get_wtime();
+
+#ifdef PRINT
+    printf("Total time for program execution: %.16g\n",
+           omp_end_time - omp_start_time);
+#endif
+#ifdef CSV
+    printf("%lld, %lld, %d, %d, %f, %d, %d\n", Nx, Ny, particle_count, T,
+           omp_end_time - omp_start_time, max_Mass, NUMBER_OF_THREADS);
+#endif
 
     // ---------- cleanup ----------
-
-    clock_time = clock() - clock_time;
-    double omp_end_time = omp_get_wtime();
-    double time_taken = ((double)clock_time) / CLOCKS_PER_SEC;  // in seconds
-    if (print) {
-        printf("Total time for program execution: %.16g\n",
-               omp_end_time - omp_start_time);
-    } else if (print_csv) {
-        // printf( "Nx, Ny, particle_count,T, walltime, max_mass\n", Nx, Ny,
-        // particle_count, T, time_taken, max_Mass);
-        printf("%lld, %lld, %d, %d, %f, %d\n", Nx, Ny, particle_count, T,
-               time_taken, max_Mass);
-    }
-
     // free the min and max values
     free(min_x);
     free(max_x);
@@ -197,7 +212,7 @@ int main(int argc, char **argv) {
     free(P);
 
     // done
-    return (success) ? EXIT_SUCCESS : EXIT_FAILURE;
+    return EXIT_SUCCESS;
 }
 
 Matrix createMatrix(int Nx, int Ny) {
