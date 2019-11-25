@@ -162,8 +162,8 @@ int main(int argc, char **argv) {
         printf("\n");
     }
     printf("\n--FINAL POSITIONS OF PARTICLES--\n");
-    for (size_t i = 0; i < particle_count; i++) {
-        printf("%d %d", P[i].pos.x, P[i].pos.y);
+    for (int i = 0; i < particle_count; i++) {
+        printf("%f %f ", P[i].pos.x, P[i].pos.y);
     }
     printf("\n----\n");
 
