@@ -11,6 +11,7 @@ The goal of this assignment is to parallelize the sequential implementation of t
 - Illustrate the data in appropriate speedup/efficiency figures and discuss them. What can you observe?
 
 - https://www.youtube.com/watch?v=jdYHVeh2wEI&list=PLLX-Q6B8xqZ8n8bwjGdzBJ25X2utwnoEG&index=10 I guess we would use dynamic for schedule
+- How to SGE-OPENMP on LCC2: https://www.uibk.ac.at/zid/systeme/hpc-systeme/common/tutorials/sge-howto.html
 
 ## General Notes
 
@@ -19,4 +20,4 @@ All the material required by the tasks above (e.g. code, figures, etc...) must b
 **Every** member of your group must be able to explain the given problem, your solution, and possible findings. You may also need to answer detailed questions about any of these aspects.
 
 **Please run any benchmarks or heavy CPU loads only on the compute nodes, not on the login node.**
-If you want to do some interactive experimentation, use an *interactive job* as outlined in the tutorial. Make sure to stop any interactive jobs once you are done.
+If you want to do some interactive experimentation, use an _interactive job_ as outlined in the tutorial. Make sure to stop any interactive jobs once you are done.

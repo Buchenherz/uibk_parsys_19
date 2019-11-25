@@ -1,7 +1,7 @@
 for i in range(1,9):
 	job_name = "nbody2D_omp"
 	output_filename = job_name + f"{i}threads.out"
-	howmany_perwhathost = "openmpi-1perhost 1"
+	howmany_perwhathost = f"openmp {i}"
 	what2make = "seq"
 	
 	out_txt = f"""#!/bin/bash
