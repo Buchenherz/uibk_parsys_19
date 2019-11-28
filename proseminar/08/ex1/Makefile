@@ -30,6 +30,9 @@ clean:
 
 .PHONEY: run
 run: all
-	@echo "Sequential OMP:"
-	@./2D_n-body_simulation_seq
-	
+	@echo "Sequential:"
+	@./pi_seq 100000
+	@./heat_stencil_2D_seq
+	@echo "OMP:"
+	@./pi_omp 100000
+	@./heat_stencil_2D_omp
