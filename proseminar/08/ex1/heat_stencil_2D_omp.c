@@ -7,7 +7,7 @@
 typedef double value_t;
 
 #define RESOLUTION 100
-#define VERBOSE
+// #define VERBOSE
 
 // -- Matrix utilities --
 
@@ -30,7 +30,7 @@ int main(int argc, char **argv) {
         N = atoi(argv[1]);
         M = atoi(argv[2]);
     }
-    int T = (N < M ? M : N) * 500;
+    int T = 10000;
 #ifdef VERBOSE
     printf(
         "Computing heat-distribution for room size N=%d, M=%d for T=%d "
@@ -133,7 +133,9 @@ int main(int argc, char **argv) {
     releaseMatrix(A);
     double end_time = omp_get_wtime();
     double time_taken = end_time - start_time;
+#ifdef PRINT_CSV_HEADER
     printf("Walltime, M, N\n");
+#endif
     printf("%f, %d, %d\n", time_taken, M, N);
 
     // done
