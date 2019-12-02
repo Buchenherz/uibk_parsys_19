@@ -10,7 +10,7 @@ int main(int argc, char *argv[]) {
     double start_time = omp_get_wtime();
     srand(time(NULL));
 
-    long int MAX_GEN_ELEMENTS;
+    unsigned long long int MAX_GEN_ELEMENTS;
     int number_of_chunks = 8;
 
     // https://www.tutorialspoint.com/cprogramming/c_command_line_arguments.htm
@@ -24,10 +24,11 @@ int main(int argc, char *argv[]) {
         return EXIT_FAILURE;
     }
 
-    int global_hits = 0;
+    unsigned long long int global_hits = 0;
 
     // calculate amount of work to be done by each thread
-    int num_elements_per_thread = MAX_GEN_ELEMENTS / number_of_chunks;
+    unsigned long long int num_elements_per_thread =
+        MAX_GEN_ELEMENTS / number_of_chunks;
 #ifdef VERBOSE
     printf("num_elements_per_thread %d\n", num_elements_per_thread);
 #endif
@@ -36,9 +37,9 @@ int main(int argc, char *argv[]) {
 #pragma omp parallel for reduction(+ : global_hits)
     for (int chunks = 0; chunks < number_of_chunks; chunks++) {
         // Set up local hits of chunk
-        int local_hits = 0;
-        for (int chunksize = 0; chunksize < num_elements_per_thread;
-             chunksize++) {
+        unsigned long long int local_hits = 0;
+        for (unsigned long long int chunksize = 0;
+             chunksize < num_elements_per_thread; chunksize++) {
             // https://itp.tugraz.at/MML/MonteCarlo/MCIntro.pdf
             // floats in range 0 to 1
             double random_x = (double)rand() / RAND_MAX;
@@ -59,6 +60,8 @@ int main(int argc, char *argv[]) {
 #ifdef VERBOSE
     printf("Total hits: %d ", global_hits);
 #endif
-    printf("PI, Walltime\n");
-    printf("%f, %f\n", pi, (end_time - start_time));
+#ifdef PRINT_CSV_HEADER
+    printf("PI, Walltime, Number_of_elements\n");
+#endif
+    printf("%f, %f, %llu\n", pi, end_time - start_time, MAX_GEN_ELEMENTS);
 }

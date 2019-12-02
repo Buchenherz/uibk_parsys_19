@@ -8,7 +8,7 @@ int main(int argc, char *argv[]) {
     double start_time = omp_get_wtime();
     srand(time(NULL));
 
-    long int MAX_GEN_ELEMENTS;
+    unsigned long long int MAX_GEN_ELEMENTS;
 
     // region user input
     // https://www.tutorialspoint.com/cprogramming/c_command_line_arguments.htm
@@ -19,8 +19,8 @@ int main(int argc, char *argv[]) {
         return EXIT_FAILURE;
     }
     // endregion
-    int hits = 0;
-    for (int gen = 0; gen < MAX_GEN_ELEMENTS; gen++) {
+    unsigned long long int hits = 0;
+    for (unsigned long long int gen = 0; gen < MAX_GEN_ELEMENTS; gen++) {
         // https://itp.tugraz.at/MML/MonteCarlo/MCIntro.pdf
         double random_x = (double)rand() / RAND_MAX;  // float in range 0 to 1
         double random_y = (double)rand() / RAND_MAX;
@@ -31,6 +31,8 @@ int main(int argc, char *argv[]) {
     }
     double pi = ((double)hits / (double)MAX_GEN_ELEMENTS) * 4;
     double end_time = omp_get_wtime();
-    printf("PI, Walltime\n");
-    printf("%f, %f\n", pi, end_time - start_time);
+#ifdef PRINT_CSV_HEADER
+    printf("PI, Walltime, Number_of_elements\n");
+#endif
+    printf("%f, %f, %llu\n", pi, end_time - start_time, MAX_GEN_ELEMENTS);
 }
