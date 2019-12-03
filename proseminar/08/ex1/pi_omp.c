@@ -11,13 +11,10 @@ int main(int argc, char *argv[]) {
     srand(time(NULL));
 
     unsigned long long int MAX_GEN_ELEMENTS;
-    int number_of_chunks = 8;
 
     // https://www.tutorialspoint.com/cprogramming/c_command_line_arguments.htm
-    if (argc == 3) {
-        MAX_GEN_ELEMENTS = atoi(argv[1]);
-        number_of_chunks = atoi(argv[2]);
-    } else if (argc == 2) {
+
+    if (argc == 2) {
         MAX_GEN_ELEMENTS = atoi(argv[1]);
     } else {
         printf("Usage: ./pi_mpi <Number of gen elements> <Number of chunks>\n");
@@ -26,35 +23,26 @@ int main(int argc, char *argv[]) {
 
     unsigned long long int global_hits = 0;
 
-    // calculate amount of work to be done by each thread
-    unsigned long long int num_elements_per_thread =
-        MAX_GEN_ELEMENTS / number_of_chunks;
 #ifdef VERBOSE
     printf("num_elements_per_thread %d\n", num_elements_per_thread);
 #endif
 
 // Split the parallel workload up
 #pragma omp parallel for reduction(+ : global_hits)
-    for (int chunks = 0; chunks < number_of_chunks; chunks++) {
-        // Set up local hits of chunk
-        unsigned long long int local_hits = 0;
-        for (unsigned long long int chunksize = 0;
-             chunksize < num_elements_per_thread; chunksize++) {
-            // https://itp.tugraz.at/MML/MonteCarlo/MCIntro.pdf
-            // floats in range 0 to 1
-            double random_x = (double)rand() / RAND_MAX;
-            double random_y = (double)rand() / RAND_MAX;
-            double random_point = pow(random_x, 2) + pow(random_y, 2);
-            if (random_point < 1) {
-                local_hits++;
-            }
+    for (unsigned long long int i = 0; i < MAX_GEN_ELEMENTS; i++) {
+        // https://itp.tugraz.at/MML/MonteCarlo/MCIntro.pdf
+        // floats in range 0 to 1
+        double random_x = (double)rand() / RAND_MAX;
+        double random_y = (double)rand() / RAND_MAX;
+        double random_point = pow(random_x, 2) + pow(random_y, 2);
+        if (random_point < 1) {
+            global_hits++;
         }
-        // Reduce local hits to global hits
-        global_hits += local_hits;
-#ifdef VERBOSE
-        printf("Local hits: %d\n", local_hits);
-#endif
     }
+
+#ifdef VERBOSE
+    printf("Local hits: %d\n", local_hits);
+#endif
     double pi = (4.0 * (double)global_hits) / (double)MAX_GEN_ELEMENTS;
     double end_time = omp_get_wtime();
 #ifdef VERBOSE
