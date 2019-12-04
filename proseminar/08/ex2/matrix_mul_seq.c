@@ -55,7 +55,6 @@ int main(int argc, char **argv)
   B = randomlyFillMatrix(B, M, L, print);
 
   // ---------- compute ----------
-  // .. we propagate the temperature
   for (int i = 0; i < N; i++) {
     for (int j = 0; j < L; j++) {
       for (int k = 0; k < M; k++) {

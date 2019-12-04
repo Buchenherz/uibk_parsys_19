@@ -30,7 +30,6 @@ int main(int argc, char **argv)
   int N = 10; // columns
   int M = 100; // rows
   int L = 10; // rows
-  clock_t start_time;
   bool print = false;
 
   if (argc > 3) {
@@ -43,7 +42,7 @@ int main(int argc, char **argv)
     printf("usage: matrix_mul_seq <int Matrix1 rows> <int Matrix1 columns && Matrix2 rows> <int Matrix2 columns> <string print>\n");
   }
 
-  start_time = clock();
+  double start_time = omp_get_wtime();
   // ---------- setup ----------
   srand(1234);   // Initialization, should only be called once.
 
@@ -56,8 +55,7 @@ int main(int argc, char **argv)
   B = randomlyFillMatrix(B, M, L, print);
 
   // ---------- compute ----------
-  // .. we propagate the temperature
-  #pragma omp parallel for schedule(static)
+  #pragma omp parallel for schedule(static,10) shared(C) firstprivate(A,B)
   for (int i = 0; i < N; i++) {
     for (int j = 0; j < L; j++) {
       for (int k = 0; k < M; k++) {
@@ -74,9 +72,8 @@ int main(int argc, char **argv)
   releaseMatrix(B);
   releaseMatrix(C);
 
-  start_time = clock() - start_time;
-  double time_taken = ((double)start_time) / CLOCKS_PER_SEC; // in seconds
-  printf("matrix multiplication took %f seconds to execute \n", time_taken);
+  double time_taken = omp_get_wtime() - start_time;
+  printf("%d x %d x %d, %f\n", N, M, L, time_taken);
 
   // done
   return EXIT_SUCCESS;
