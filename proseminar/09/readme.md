@@ -8,6 +8,10 @@ The goal of this assignment is to implement the n-queens problem using OpenMP.
 
 N-queens is a popular branch-and-bound problem. The goal is to compute the number of possible ways to place N chess queens on a NxN chess board without them attacking each other. See https://en.wikipedia.org/wiki/Eight_queens_puzzle for further information.
 
+#### Useful resources
+
+- https://developers.google.com/optimization/cp/queens
+
 ### Tasks
 
 - Implement a sequential version of the n-queens problem. Benchmark your program for several problem sizes. What can you observe?
@@ -22,4 +26,4 @@ All the material required by the tasks above (e.g. code, figures, etc...) must b
 **Every** member of your group must be able to explain the given problem, your solution, and possible findings. You may also need to answer detailed questions about any of these aspects.
 
 **Please run any benchmarks or heavy CPU loads only on the compute nodes, not on the login node.**
-If you want to do some interactive experimentation, use an *interactive job* as outlined in the tutorial. Make sure to stop any interactive jobs once you are done.
+If you want to do some interactive experimentation, use an _interactive job_ as outlined in the tutorial. Make sure to stop any interactive jobs once you are done.

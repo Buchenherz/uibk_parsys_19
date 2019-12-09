@@ -1,26 +1,23 @@
 /* C/C++ program to solve N Queen Problem using
 backtracking Original code by
 https://www.geeksforgeeks.org/n-queen-problem-backtracking-3/.
-Modified to allow multiple solution lookup
+Modified to allow multiple solution lookup.
+There is also a trick with matrix as function parameter passing that works quite
+well here:
+https://stackoverflow.com/questions/18661702/passing-matrix-as-a-parameter-in-function
 */
-#define N 14
+
+#include <omp.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
+// Total amount of possible solutions
 int size;
-int one_possible_solution[N][N];
-
-/* A utility function to copy over the first possible solution if one exists
- * Credits to:
- * https://stackoverflow.com/questions/12675800/how-to-copy-matrix-in-c*/
-void matriscopy(void* destmat, void* srcmat) {
-    memcpy(destmat, srcmat, N * N * sizeof(int));
-}
 
 /* A utility function to print solution */
-void printSolution(int board[N][N]) {
+void printSolution(int N, int board[N][N]) {
     for (int i = 0; i < N; i++) {
         for (int j = 0; j < N; j++) printf(" %d ", board[i][j]);
         printf("\n");
@@ -33,7 +30,7 @@ function is called when "col" queens are
 already placed in columns from 0 to col -1.
 So we need to check only left side for
 attacking queens */
-bool isSafe(int board[N][N], int row, int col) {
+bool isSafe(int row, int col, int N, int board[N][N]) {
     int i, j;
 
     /* Check this row on left side */
@@ -53,17 +50,16 @@ bool isSafe(int board[N][N], int row, int col) {
 
 /* A recursive utility function to solve N
 Queen problem */
-bool solveNQUtil(int board[N][N], int col) {
+bool solveNQUtil(int col, int N, int board[N][N]) {
     /* base case: If all queens are placed
     then return true */
     if (col >= N) {
         size += 1;
-        if (size == 1) {
-            matriscopy(one_possible_solution, board);
-        }
 #ifdef DEBUG
-        // This will print every possible solution
-        printSolution(board);
+        if (size == 1) {
+            // This will print one possible solution
+            printSolution(board);
+        }
 #endif
     }
 
@@ -72,12 +68,12 @@ bool solveNQUtil(int board[N][N], int col) {
     for (int i = 0; i < N; i++) {
         /* Check if the queen can be placed on
         board[i][col] */
-        if (isSafe(board, i, col)) {
+        if (isSafe(i, col, N, board)) {
             /* Place this queen in board[i][col] */
             board[i][col] = 1;
 
             /* recur to place rest of the queens */
-            if (solveNQUtil(board, col + 1)) return true;
+            if (solveNQUtil(col + 1, N, board)) return true;
 
             /* If placing queen in board[i][col]
             doesn't lead to a solution, then
@@ -99,26 +95,35 @@ prints placement of queens in the form of 1s.
 Please note that there may be more than one
 solutions, this function prints one of the
 feasible solutions.*/
-bool solveNQ() {
-    int board[N][N] = {{0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}};
-    solveNQUtil(board, 0);
+bool solveNQ(int N) {
+    int board[N][N];
+    for (int i = 0; i < N; i++) {
+        for (int j = 0; j < N; j++) {
+            board[i][j] = 0;
+        }
+    }
+    double start_time = omp_get_wtime();
+    solveNQUtil(0, N, board);
+    double end_time = omp_get_wtime();
     if (size == 0) {
-        printf("Solution does not exist\n");
+        printf("%d, %f\n", size, end_time - start_time);
         return false;
-    } else if (size == 1) {
-        printf("There exists %d possible solution. Here it is:\n", size);
-        printSolution(one_possible_solution);
     } else {
-        printf("There exist %d possible solutions. Here is the first one:\n",
-               size);
-        printSolution(one_possible_solution);
+        printf("%d, %f\n", size, end_time - start_time);
         return true;
     }
 }
 
 // driver program to test above function
-int main(int argc, char* argv[]) {
+int main(int argc, char *argv[]) {
     size = 0;
-    solveNQ();
-    return 0;
+    int N;
+    if (argc == 2) {
+        N = atoi(argv[1]);
+    } else {
+        printf("Usage: ./program <Nqueens>\n");
+        return EXIT_FAILURE;
+    }
+    solveNQ(N);
+    return EXIT_SUCCESS;
 }
