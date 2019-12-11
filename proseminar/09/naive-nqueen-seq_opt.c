@@ -1,3 +1,5 @@
+// Bitshift-magic solution found on
+// https://rosettacode.org/wiki/N-queens_problem#C
 #include <stdio.h>
 #define MAXN 31
  
