@@ -1,4 +1,4 @@
-CC=gcc-9
+CC=gcc
 MPICC=mpicc
 CC_FLAGS=-O3 -std=c99 -Wall -Wextra -pedantic -lm 
 OMP_FLAGS=-lm -fopenmp -O3 -std=c99 -Wall -Wextra -pedantic 
@@ -13,7 +13,7 @@ seq-nqueens: naive-nqueens.c
 
 
 omp-nqueens: naive-nqueens-omp.c
-	@$(CC) $(OMP_FLAGS) $< -o naive-nqueens-omp.out
+	@$(CC) $(OMP_FLAGS) $< -o naive-nqueens-omp
 
 
 .PHONEY: clean
