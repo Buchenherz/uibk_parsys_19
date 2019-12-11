@@ -1,0 +1,409 @@
+<?xml version='1.0' encoding='utf-8' ?>
+
+<!-- build 20194.19.1010.1202                               -->
+<workbook original-version='18.1' source-build='2019.4.0 (20194.19.1010.1202)' source-platform='win' version='18.1' xmlns:user='http://www.tableausoftware.com/xml/user'>
+  <document-format-change-manifest>
+    <SheetIdentifierTracking ignorable='true' predowngraded='true' />
+    <WindowsPersistSimpleIdentifiers />
+  </document-format-change-manifest>
+  <preferences>
+    <preference name='ui.encoding.shelf.height' value='24' />
+    <preference name='ui.shelf.height' value='26' />
+  </preferences>
+  <datasources>
+    <datasource caption='Union of csvoutputs' inline='true' name='Flow1-node-Union 1-38248a0141b745cca4cffdbfa418c4da' version='18.1'>
+      <connection class='federated'>
+        <named-connections>
+          <named-connection caption='csvout' name='hyper.16kcca500t9xkt187vuou1sin9fb'>
+            <connection authentication='auth-none' author-locale='de_DE' class='hyper' dbname='C:/Users/mathi/Desktop/workspace/uibk_parsys_19/proseminar/09/statistics/csvout.hyper' default-settings='yes' sslmode='' username='tableau_internal_user' />
+          </named-connection>
+        </named-connections>
+        <relation connection='hyper.16kcca500t9xkt187vuou1sin9fb' name='Extract' table='[Extract].[Extract]' type='table' />
+        <metadata-records>
+          <metadata-record class='column'>
+            <remote-name>Table Names</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[Table Names]</local-name>
+            <parent-name>[Extract]</parent-name>
+            <remote-alias>Table Names</remote-alias>
+            <ordinal>0</ordinal>
+            <family>Extract</family>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <approx-count>8</approx-count>
+            <contains-null>true</contains-null>
+            <collation flag='0' name='binary' />
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>N</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[N]</local-name>
+            <parent-name>[Extract]</parent-name>
+            <remote-alias>N</remote-alias>
+            <ordinal>1</ordinal>
+            <family>Extract</family>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <approx-count>17</approx-count>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>walltime</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[walltime]</local-name>
+            <parent-name>[Extract]</parent-name>
+            <remote-alias>walltime</remote-alias>
+            <ordinal>2</ordinal>
+            <family>Extract</family>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <approx-count>127</approx-count>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>Solutions</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[Solutions]</local-name>
+            <parent-name>[Extract]</parent-name>
+            <remote-alias>Solutions</remote-alias>
+            <ordinal>3</ordinal>
+            <family>Extract</family>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <approx-count>16</approx-count>
+            <contains-null>true</contains-null>
+          </metadata-record>
+        </metadata-records>
+      </connection>
+      <aliases enabled='yes' />
+      <column caption='Number of Threads' datatype='integer' name='[Calculation_580190357535850496]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='IF [Table Names] = &quot;naive-nqueens-omp8threads.csv&quot; then 8&#13;&#10;ELSEIF [Table Names] = &quot;naive-nqueens-omp7threads.csv&quot; then 7&#13;&#10;ELSEIF [Table Names] = &quot;naive-nqueens-omp6threads.csv&quot; then 6&#13;&#10;ELSEIF [Table Names] = &quot;naive-nqueens-omp5threads.csv&quot; then 5&#13;&#10;ELSEIF [Table Names] = &quot;naive-nqueens-omp4threads.csv&quot; then 4&#13;&#10;ELSEIF [Table Names] = &quot;naive-nqueens-omp3threads.csv&quot; then 3&#13;&#10;ELSEIF [Table Names] = &quot;naive-nqueens-omp2threads.csv&quot; then 2&#13;&#10;ELSE 1&#13;&#10;END' />
+      </column>
+      <column caption='Speedup' datatype='real' name='[Calculation_580190357536522241]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='if [N x M x L] = &quot;100 x 1000 x 100&quot; then 0.062718/[walltime]&#10;elseif [N x M x L] = &quot;100 x 2000 x 100&quot; then 0.284097/[walltime]&#10;elseif [N x M x L] = &quot;100 x 3000 x 100&quot; then 0.223312/[walltime]&#10;elseif [N x M x L] = &quot;100 x 4000 x 100&quot; then 0.297733/[walltime]&#10;elseif [N x M x L] = &quot;100 x 5000 x 100&quot; then 0.428837/[walltime]&#10;elseif [N x M x L] = &quot;100 x 6000 x 100&quot; then 1.032157/[walltime]&#10;elseif [N x M x L] = &quot;100 x 7000 x 100&quot; then 1.192882/[walltime]&#10;elseif [N x M x L] = &quot;100 x 8000 x 100&quot; then 1.265091/[walltime]&#10;elseif [N x M x L] = &quot;100 x 9000 x 100&quot; then 1.172681/[walltime]&#10;elseif [N x M x L] = &quot;100 x 10000 x 100&quot; then 1.799703/[walltime]&#10;elseif [N x M x L] = &quot;100 x 11000 x 100&quot; then 2.016427/[walltime]&#10;elseif [N x M x L] = &quot;100 x 12000 x 100&quot; then 1.538884/[walltime]&#10;elseif [N x M x L] = &quot;100 x 13000 x 100&quot; then 3.019488/[walltime]&#10;elseif [N x M x L] = &quot;100 x 14000 x 100&quot; then 2.665943/[walltime]&#10;elseif [N x M x L] = &quot;100 x 15000 x 100&quot; then 1.219920/[walltime]&#10;elseif [N x M x L] = &quot;100 x 16000 x 100&quot; then 1.350110/[walltime]&#10;elseif [N x M x L] = &quot;100 x 17000 x 100&quot; then 1.738410/[walltime]&#10;elseif [N x M x L] = &quot;100 x 18000 x 100&quot; then 1.798789/[walltime]&#10;elseif [N x M x L] = &quot;100 x 19000 x 100&quot; then 1.592513/[walltime]&#10;elseif [N x M x L] = &quot;100 x 20000 x 100&quot; then 2.371723/[walltime]&#10;elseif [N x M x L] = &quot;100 x 21000 x 100&quot; then 4.214633/[walltime]&#10;elseif [N x M x L] = &quot;100 x 22000 x 100&quot; then 4.274880/[walltime]&#10;elseif [N x M x L] = &quot;100 x 23000 x 100&quot; then 3.626148/[walltime]&#10;elseif [N x M x L] = &quot;100 x 24000 x 100&quot; then 3.165740/[walltime]&#10;elseif [N x M x L] = &quot;100 x 25000 x 100&quot; then 3.253941/[walltime]&#10;elseif [N x M x L] = &quot;100 x 26000 x 100&quot; then 2.925919/[walltime]&#10;elseif [N x M x L] = &quot;100 x 27000 x 100&quot; then 3.108285/[walltime]&#10;elseif [N x M x L] = &quot;100 x 28000 x 100&quot; then 5.483619/[walltime]&#10;elseif [N x M x L] = &quot;100 x 29000 x 100&quot; then 3.273222/[walltime]&#10;elseif [N x M x L] = &quot;100 x 30000 x 100&quot; then 2.818222/[walltime]&#10;elseif [N x M x L] = &quot;100 x 31000 x 100&quot; then 3.485852/[walltime]&#10;elseif [N x M x L] = &quot;100 x 32000 x 100&quot; then 5.279652/[walltime]&#10;elseif [N x M x L] = &quot;100 x 33000 x 100&quot; then 6.496949/[walltime]&#10;elseif [N x M x L] = &quot;100 x 34000 x 100&quot; then 11.711544/[walltime]&#10;elseif [N x M x L] = &quot;100 x 35000 x 100&quot; then 5.642427/[walltime]&#10;elseif [N x M x L] = &quot;100 x 36000 x 100&quot; then 4.794379/[walltime]&#10;elseif [N x M x L] = &quot;100 x 37000 x 100&quot; then 5.761045/[walltime]&#10;elseif [N x M x L] = &quot;100 x 38000 x 100&quot; then 5.924662/[walltime]&#10;elseif [N x M x L] = &quot;100 x 39000 x 100&quot; then 6.455713/[walltime]&#10;elseif [N x M x L] = &quot;100 x 40000 x 100&quot; then 7.075465/[walltime]&#10;elseif [N x M x L] = &quot;100 x 41000 x 100&quot; then 9.542363/[walltime]&#10;elseif [N x M x L] = &quot;100 x 42000 x 100&quot; then 8.842776/[walltime]&#10;elseif [N x M x L] = &quot;100 x 43000 x 100&quot; then 8.972450/[walltime]&#10;elseif [N x M x L] = &quot;100 x 44000 x 100&quot; then 13.225268/[walltime]&#10;elseif [N x M x L] = &quot;100 x 45000 x 100&quot; then 14.907722/[walltime]&#10;elseif [N x M x L] = &quot;100 x 46000 x 100&quot; then 26.796710/[walltime]&#10;elseif [N x M x L] = &quot;100 x 47000 x 100&quot; then 18.111618/[walltime]&#10;elseif [N x M x L] = &quot;100 x 48000 x 100&quot; then 21.909274/[walltime]&#10;elseif [N x M x L] = &quot;100 x 49000 x 100&quot; then 12.213173/[walltime]&#10;elseif [N x M x L] = &quot;100 x 50000 x 100&quot; then 24.541918/[walltime]&#10;elseif [N x M x L] = &quot;100 x 51000 x 100&quot; then 39.902184/[walltime]&#10;elseif [N x M x L] = &quot;100 x 52000 x 100&quot; then 29.015506/[walltime]&#10;elseif [N x M x L] = &quot;100 x 53000 x 100&quot; then 32.099698/[walltime]&#10;elseif [N x M x L] = &quot;100 x 54000 x 100&quot; then 37.105789/[walltime]&#10;elseif [N x M x L] = &quot;100 x 55000 x 100&quot; then 42.016533/[walltime]&#10;elseif [N x M x L] = &quot;100 x 56000 x 100&quot; then 35.021297/[walltime]&#10;elseif [N x M x L] = &quot;100 x 57000 x 100&quot; then 19.995370/[walltime]&#10;elseif [N x M x L] = &quot;100 x 58000 x 100&quot; then 14.209974/[walltime]&#10;elseif [N x M x L] = &quot;100 x 59000 x 100&quot; then 11.644575/[walltime]&#10;elseif [N x M x L] = &quot;100 x 60000 x 100&quot; then 17.815074/[walltime]&#10;elseif [N x M x L] = &quot;100 x 61000 x 100&quot; then 17.945708/[walltime]&#10;elseif [N x M x L] = &quot;100 x 62000 x 100&quot; then 13.663933/[walltime]&#10;elseif [N x M x L] = &quot;100 x 63000 x 100&quot; then 20.995160/[walltime]&#10;elseif [N x M x L] = &quot;100 x 64000 x 100&quot; then 41.007765/[walltime]&#10;elseif [N x M x L] = &quot;100 x 65000 x 100&quot; then 25.289909/[walltime]&#10;elseif [N x M x L] = &quot;100 x 66000 x 100&quot; then 19.841621/[walltime]&#10;elseif [N x M x L] = &quot;100 x 67000 x 100&quot; then 30.593794/[walltime]&#10;elseif [N x M x L] = &quot;100 x 68000 x 100&quot; then 27.102812/[walltime]&#10;elseif [N x M x L] = &quot;100 x 69000 x 100&quot; then 31.095033/[walltime]&#10;elseif [N x M x L] = &quot;100 x 70000 x 100&quot; then 37.467482/[walltime]&#10;elseif [N x M x L] = &quot;100 x 71000 x 100&quot; then 35.705399/[walltime]&#10;elseif [N x M x L] = &quot;100 x 72000 x 100&quot; then 35.173527/[walltime]&#10;elseif [N x M x L] = &quot;100 x 73000 x 100&quot; then 26.914554/[walltime]&#10;elseif [N x M x L] = &quot;100 x 74000 x 100&quot; then 30.156766/[walltime]&#10;elseif [N x M x L] = &quot;100 x 75000 x 100&quot; then 41.942845/[walltime]&#10;elseif [N x M x L] = &quot;100 x 76000 x 100&quot; then 26.016897/[walltime]&#10;elseif [N x M x L] = &quot;100 x 77000 x 100&quot; then 20.263159/[walltime]&#10;elseif [N x M x L] = &quot;100 x 78000 x 100&quot; then 23.102077/[walltime]&#10;elseif [N x M x L] = &quot;100 x 79000 x 100&quot; then 24.465974/[walltime]&#10;elseif [N x M x L] = &quot;100 x 80000 x 100&quot; then 28.237156/[walltime]&#10;elseif [N x M x L] = &quot;100 x 81000 x 100&quot; then 24.203151/[walltime]&#10;elseif [N x M x L] = &quot;100 x 82000 x 100&quot; then 16.437271/[walltime]&#10;elseif [N x M x L] = &quot;100 x 83000 x 100&quot; then 17.042158/[walltime]&#10;elseif [N x M x L] = &quot;100 x 84000 x 100&quot; then 17.082825/[walltime]&#10;elseif [N x M x L] = &quot;100 x 85000 x 100&quot; then 17.537589/[walltime]&#10;elseif [N x M x L] = &quot;100 x 86000 x 100&quot; then 17.965244/[walltime]&#10;elseif [N x M x L] = &quot;100 x 87000 x 100&quot; then 18.407672/[walltime]&#10;elseif [N x M x L] = &quot;100 x 88000 x 100&quot; then 18.784447/[walltime]&#10;elseif [N x M x L] = &quot;100 x 89000 x 100&quot; then 18.997346/[walltime]&#10;elseif [N x M x L] = &quot;100 x 90000 x 100&quot; then 19.379746/[walltime]&#10;elseif [N x M x L] = &quot;100 x 91000 x 100&quot; then 19.744803/[walltime]&#10;elseif [N x M x L] = &quot;100 x 92000 x 100&quot; then 20.131233/[walltime]&#10;elseif [N x M x L] = &quot;100 x 93000 x 100&quot; then 20.629172/[walltime]&#10;elseif [N x M x L] = &quot;100 x 94000 x 100&quot; then 20.851314/[walltime]&#10;elseif [N x M x L] = &quot;100 x 95000 x 100&quot; then 21.216267/[walltime]&#10;elseif [N x M x L] = &quot;100 x 96000 x 100&quot; then 21.553760/[walltime]&#10;elseif [N x M x L] = &quot;100 x 97000 x 100&quot; then 22.088309/[walltime]&#10;elseif [N x M x L] = &quot;100 x 98000 x 100&quot; then 22.503397/[walltime]&#10;elseif [N x M x L] = &quot;100 x 99000 x 100&quot; then 22.666980/[walltime]&#10;else 23.006118/[walltime]&#10;END' />
+      </column>
+      <column datatype='integer' name='[Number of Records]' role='measure' type='quantitative' user:auto-column='numrec'>
+        <calculation class='tableau' formula='1' />
+      </column>
+      <column caption='Walltime' datatype='real' name='[walltime]' role='measure' type='quantitative' />
+      <column-instance column='[Calculation_580190357535850496]' derivation='None' name='[none:Calculation_580190357535850496:ok]' pivot='key' type='ordinal' />
+      <layout dim-ordering='alphabetic' dim-percentage='0.433121' measure-ordering='alphabetic' measure-percentage='0.566879' show-structure='true' />
+      <style>
+        <style-rule element='mark'>
+          <encoding attr='color' field='[none:Calculation_580190357535850496:ok]' type='palette'>
+            <map to='#4e79a7'>
+              <bucket>1</bucket>
+            </map>
+            <map to='#59a14f'>
+              <bucket>5</bucket>
+            </map>
+            <map to='#76b7b2'>
+              <bucket>4</bucket>
+            </map>
+            <map to='#b07aa1'>
+              <bucket>7</bucket>
+            </map>
+            <map to='#e15759'>
+              <bucket>3</bucket>
+            </map>
+            <map to='#edc948'>
+              <bucket>6</bucket>
+            </map>
+            <map to='#f28e2b'>
+              <bucket>2</bucket>
+            </map>
+            <map to='#ff9da7'>
+              <bucket>8</bucket>
+            </map>
+          </encoding>
+        </style-rule>
+      </style>
+      <semantic-values>
+        <semantic-value key='[Country].[Name]' value='&quot;Österreich&quot;' />
+      </semantic-values>
+      <field-sort-info field-sort-order-type='custom-order'>
+        <field-sort-custom-order field='Table Names' />
+        <field-sort-custom-order field='Calculation_580190357535850496' />
+        <field-sort-custom-order field='walltime' />
+        <field-sort-custom-order field='Calculation_580190357536522241' />
+        <field-sort-custom-order field='N x M x L' />
+      </field-sort-info>
+    </datasource>
+  </datasources>
+  <worksheets>
+    <worksheet name='Absolute Walltime in relation to Problem Size'>
+      <layout-options export-center-horz='true' export-center-vert='true' export-legend-direction='horizontal' export-margin-bottom='0' export-margin-left='0' export-margin-right='0' export-margin-top='0' export-orientation='landscape' export-scale-fitpage='false' export-scale-mode-auto='false' export-scale-percent='50' />
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='Union of csvoutputs' name='Flow1-node-Union 1-38248a0141b745cca4cffdbfa418c4da' />
+          </datasources>
+          <datasource-dependencies datasource='Flow1-node-Union 1-38248a0141b745cca4cffdbfa418c4da'>
+            <column caption='Number of Threads' datatype='integer' name='[Calculation_580190357535850496]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='IF [Table Names] = &quot;naive-nqueens-omp8threads.csv&quot; then 8&#13;&#10;ELSEIF [Table Names] = &quot;naive-nqueens-omp7threads.csv&quot; then 7&#13;&#10;ELSEIF [Table Names] = &quot;naive-nqueens-omp6threads.csv&quot; then 6&#13;&#10;ELSEIF [Table Names] = &quot;naive-nqueens-omp5threads.csv&quot; then 5&#13;&#10;ELSEIF [Table Names] = &quot;naive-nqueens-omp4threads.csv&quot; then 4&#13;&#10;ELSEIF [Table Names] = &quot;naive-nqueens-omp3threads.csv&quot; then 3&#13;&#10;ELSEIF [Table Names] = &quot;naive-nqueens-omp2threads.csv&quot; then 2&#13;&#10;ELSE 1&#13;&#10;END' />
+            </column>
+            <column datatype='integer' name='[N]' role='measure' type='quantitative' />
+            <column datatype='string' name='[Table Names]' role='dimension' type='nominal' />
+            <column-instance column='[Calculation_580190357535850496]' derivation='None' name='[none:Calculation_580190357535850496:ok]' pivot='key' type='ordinal' />
+            <column-instance column='[N]' derivation='None' name='[none:N:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[walltime]' derivation='None' name='[none:walltime:qk]' pivot='key' type='quantitative' />
+            <column caption='Walltime' datatype='real' name='[walltime]' role='measure' type='quantitative' />
+          </datasource-dependencies>
+          <aggregation value='true' />
+        </view>
+        <style>
+          <style-rule element='axis'>
+            <format attr='title' class='0' field='[Flow1-node-Union 1-38248a0141b745cca4cffdbfa418c4da].[none:walltime:qk]' scope='rows' value='Walltime (s)' />
+          </style-rule>
+        </style>
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Line' />
+            <encodings>
+              <color column='[Flow1-node-Union 1-38248a0141b745cca4cffdbfa418c4da].[none:Calculation_580190357535850496:ok]' />
+            </encodings>
+            <style>
+              <style-rule element='mark'>
+                <format attr='mark-labels-show' value='true' />
+                <format attr='mark-labels-cull' value='true' />
+              </style-rule>
+            </style>
+          </pane>
+        </panes>
+        <rows>[Flow1-node-Union 1-38248a0141b745cca4cffdbfa418c4da].[none:walltime:qk]</rows>
+        <cols>[Flow1-node-Union 1-38248a0141b745cca4cffdbfa418c4da].[none:N:qk]</cols>
+      </table>
+      <simple-id uuid='{B8DC00AD-C686-4A2B-AC16-D55FF7709CD6}' />
+    </worksheet>
+    <worksheet name='Relative Speedup in relation to Problem Size'>
+      <layout-options export-center-horz='true' export-center-vert='true' export-legend-direction='horizontal' export-margin-bottom='0' export-margin-left='0' export-margin-right='0' export-margin-top='0' export-orientation='landscape' export-scale-fitpage='false' export-scale-mode-auto='false' export-scale-percent='50' />
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='Union of csvoutputs' name='Flow1-node-Union 1-38248a0141b745cca4cffdbfa418c4da' />
+          </datasources>
+          <datasource-dependencies datasource='Flow1-node-Union 1-38248a0141b745cca4cffdbfa418c4da'>
+            <column caption='Number of Threads' datatype='integer' name='[Calculation_580190357535850496]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='IF [Table Names] = &quot;naive-nqueens-omp8threads.csv&quot; then 8&#13;&#10;ELSEIF [Table Names] = &quot;naive-nqueens-omp7threads.csv&quot; then 7&#13;&#10;ELSEIF [Table Names] = &quot;naive-nqueens-omp6threads.csv&quot; then 6&#13;&#10;ELSEIF [Table Names] = &quot;naive-nqueens-omp5threads.csv&quot; then 5&#13;&#10;ELSEIF [Table Names] = &quot;naive-nqueens-omp4threads.csv&quot; then 4&#13;&#10;ELSEIF [Table Names] = &quot;naive-nqueens-omp3threads.csv&quot; then 3&#13;&#10;ELSEIF [Table Names] = &quot;naive-nqueens-omp2threads.csv&quot; then 2&#13;&#10;ELSE 1&#13;&#10;END' />
+            </column>
+            <column datatype='integer' name='[N]' role='measure' type='quantitative' />
+            <column datatype='string' name='[Table Names]' role='dimension' type='nominal' />
+            <column-instance column='[Calculation_580190357535850496]' derivation='None' name='[none:Calculation_580190357535850496:ok]' pivot='key' type='ordinal' />
+            <column-instance column='[N]' derivation='None' name='[none:N:qk]' pivot='key' type='quantitative' />
+          </datasource-dependencies>
+          <filter class='categorical' column='[Flow1-node-Union 1-38248a0141b745cca4cffdbfa418c4da].[none:Calculation_580190357535850496:ok]'>
+            <groupfilter function='except' user:ui-domain='relevant' user:ui-enumeration='exclusive' user:ui-marker='enumerate'>
+              <groupfilter function='level-members' level='[none:Calculation_580190357535850496:ok]' />
+              <groupfilter function='member' level='[none:Calculation_580190357535850496:ok]' member='1' />
+            </groupfilter>
+          </filter>
+          <slices>
+            <column>[Flow1-node-Union 1-38248a0141b745cca4cffdbfa418c4da].[none:Calculation_580190357535850496:ok]</column>
+          </slices>
+          <aggregation value='true' />
+        </view>
+        <style />
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Line' />
+            <encodings>
+              <color column='[Flow1-node-Union 1-38248a0141b745cca4cffdbfa418c4da].[none:Calculation_580190357535850496:ok]' />
+            </encodings>
+            <style>
+              <style-rule element='mark'>
+                <format attr='mark-labels-show' value='true' />
+                <format attr='mark-labels-cull' value='false' />
+                <format attr='mark-labels-mode' value='range' />
+              </style-rule>
+            </style>
+          </pane>
+        </panes>
+        <rows />
+        <cols>[Flow1-node-Union 1-38248a0141b745cca4cffdbfa418c4da].[none:N:qk]</cols>
+      </table>
+      <simple-id uuid='{526BCEDD-033C-49C0-A435-96A259EE9F73}' />
+    </worksheet>
+  </worksheets>
+  <windows source-height='30'>
+    <window class='worksheet' name='Absolute Walltime in relation to Problem Size'>
+      <cards>
+        <edge name='left'>
+          <strip size='160'>
+            <card type='pages' />
+            <card type='filters' />
+            <card type='marks' />
+          </strip>
+        </edge>
+        <edge name='top'>
+          <strip size='2147483647'>
+            <card type='columns' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='rows' />
+          </strip>
+          <strip size='31'>
+            <card type='title' />
+          </strip>
+        </edge>
+        <edge name='right'>
+          <strip size='160'>
+            <card pane-specification-id='0' param='[Flow1-node-Union 1-38248a0141b745cca4cffdbfa418c4da].[none:Calculation_580190357535850496:ok]' type='color' />
+          </strip>
+        </edge>
+      </cards>
+      <viewpoint>
+        <zoom type='fit-width' />
+        <highlight>
+          <color-one-way>
+            <field>[Flow1-node-Union 1-38248a0141b745cca4cffdbfa418c4da].[none:Calculation_580190357535850496:ok]</field>
+            <field>[Flow1-node-Union 1-38248a0141b745cca4cffdbfa418c4da].[none:N x M x L:nk]</field>
+          </color-one-way>
+        </highlight>
+      </viewpoint>
+      <simple-id uuid='{58D9C2CF-6C4B-4B08-98C7-D1F0BCA3B15A}' />
+    </window>
+    <window class='worksheet' maximized='true' name='Relative Speedup in relation to Problem Size'>
+      <cards>
+        <edge name='left'>
+          <strip size='160'>
+            <card type='pages' />
+            <card type='filters' />
+            <card type='marks' />
+          </strip>
+        </edge>
+        <edge name='top'>
+          <strip size='2147483647'>
+            <card type='columns' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='rows' />
+          </strip>
+          <strip size='31'>
+            <card type='title' />
+          </strip>
+        </edge>
+        <edge name='right'>
+          <strip size='160'>
+            <card pane-specification-id='0' param='[Flow1-node-Union 1-38248a0141b745cca4cffdbfa418c4da].[none:Calculation_580190357535850496:ok]' type='color' />
+          </strip>
+        </edge>
+      </cards>
+      <viewpoint>
+        <zoom type='fit-width' />
+        <highlight>
+          <color-one-way>
+            <field>[Flow1-node-Union 1-38248a0141b745cca4cffdbfa418c4da].[none:Calculation_580190357535850496:ok]</field>
+            <field>[Flow1-node-Union 1-38248a0141b745cca4cffdbfa418c4da].[none:N x M x L:nk]</field>
+          </color-one-way>
+        </highlight>
+      </viewpoint>
+      <simple-id uuid='{AED797BA-5FDD-412F-9434-DF918BDA7DD1}' />
+    </window>
+  </windows>
+  <thumbnails>
+    <thumbnail height='192' name='Absolute Walltime in relation to Problem Size' width='192'>
+      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
+    </thumbnail>
+    <thumbnail height='79' name='Relative Speedup in relation to Problem Size' width='192'>
+      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
+    </thumbnail>
+  </thumbnails>
+</workbook>
