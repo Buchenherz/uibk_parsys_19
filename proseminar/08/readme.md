@@ -24,6 +24,8 @@ On the first parallel run of the program, we restarted several threads because w
 
 In this exercise we can clearly see the improvements of using multiple threads. Geneerally, the more threads we use, the better absolute time we get. In the instance of a 5000x5000 space, we gained a speedup of 4x when using 8 threads in parallel compared to the sequential version. Interestingly, we get a spke at 1000x1000 space when using more than 4 threads.
 
+`gcc -mr native` tries to optimize to program to the local environment.
+
 ## Exercise 2
 
 ### Tasks

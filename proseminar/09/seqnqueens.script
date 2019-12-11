@@ -1,0 +1,37 @@
+#!/bin/bash
+
+# Select queue.
+#$ -q std.q
+
+# Use the current wd
+#$ -cwd
+
+# Name the job
+#$ -N nqueens-seq
+
+# Redirect output stream to this file. Useful for debugging, simple output, etc.
+#$ -o nqueens1920.out
+
+# Redirect error stream to this file.
+#$ -e error.dat
+
+# Join the error stream to the output stream.
+#$ -j yes
+
+# Specifies the parallel environment. A list is available with qconf -spl.
+#$ -pe openmp 1
+
+# check whether the syntax of the job is okay (do not submit the job)
+# #$ -w v
+
+# Load module because the software can be run on another system and not in the current
+# ssh session
+# load module
+
+module load gcc
+make omp
+export OMP_NUM_THREADS=1
+
+for ((i=19;i<=20;i+=1)); do
+    ./naive-nqueens.out "$i"
+done

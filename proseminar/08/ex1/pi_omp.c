@@ -31,7 +31,12 @@ int main(int argc, char *argv[]) {
 #pragma omp parallel for reduction(+ : global_hits)
     for (unsigned long long int i = 0; i < MAX_GEN_ELEMENTS; i++) {
         // https://itp.tugraz.at/MML/MonteCarlo/MCIntro.pdf
-        // floats in range 0 to 1
+        // floats in range 0 to 1 
+
+        // This version of rand is blocking when used by multiple threads, which is why there is a slowdown.
+        // There is also a version of rand, called `rand_r()` that needs to be used. One could use the thread number
+        // as the seed pointer.
+        
         double random_x = (double)rand() / RAND_MAX;
         double random_y = (double)rand() / RAND_MAX;
         double random_point = pow(random_x, 2) + pow(random_y, 2);
