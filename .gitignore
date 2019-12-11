@@ -11,6 +11,7 @@ proseminar/01/.ipynb_checkpoints/
 *.exe
 *.o
 *.out
+*.script
 
 proseminar/05/2D_n-body_simulation_seq.dSYM/
 
