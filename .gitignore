@@ -1,23 +1,7 @@
 
-venv
-proseminar/03/.DS_Store
+venv/
+
 .DS_Store
-proseminar/07/omp course files
-proseminar/07/testing
-proseminar/07/*.script
-.idea
-.vscode
-.ipynb_checkpoints
-proseminar/07/sge_openmpi_environment
-a.out
-proseminar/08/ex1/*threads.script
-proseminar/08/ex1/pi_omp
-proseminar/08/ex1/pi_seq
-proseminar/08/ex1/heat_stencil_2D_omp
-proseminar/08/ex1/heat_stencil_2D_seq
-.texpadtmp
-*.dSYM
-proseminar/09/naive-nqueens.out
 
 .idea/
 .vscode/

@@ -1,4 +1,4 @@
-CC=gcc-9
+CC=gcc
 MPICC=mpicc
 CC_FLAGS=-O3 -std=c99 -Wall -Wextra -pedantic -lm 
 OMP_FLAG=-fopenmp

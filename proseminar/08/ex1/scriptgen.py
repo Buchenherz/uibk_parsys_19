@@ -1,4 +1,3 @@
-import subprocess
 for i in range(1, 9):
     job_name = "pi_omp"
     output_filename = job_name + f"{i}threads.out"
@@ -45,4 +44,3 @@ done
 	"""
     with open(f"{job_name}_{i}threads.script", "w") as outfile:
         outfile.write(out_txt)
-        subprocess.run(["qsub", out_txt])

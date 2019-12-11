@@ -14,7 +14,7 @@ https://stackoverflow.com/questions/18661702/passing-matrix-as-a-parameter-in-fu
 #include <string.h>
 
 // Total amount of possible solutions
-unsigned long long size;
+int size;
 
 /* A utility function to print solution */
 void printSolution(int N, int board[N][N]) {
@@ -106,10 +106,10 @@ bool solveNQ(int N) {
     solveNQUtil(0, N, board);
     double end_time = omp_get_wtime();
     if (size == 0) {
-        printf("%lld, %f\n", size, end_time - start_time);
+        printf("%d, %f\n", size, end_time - start_time);
         return false;
     } else {
-        printf("%lld, %f\n", size, end_time - start_time);
+        printf("%d, %f\n", size, end_time - start_time);
         return true;
     }
 }

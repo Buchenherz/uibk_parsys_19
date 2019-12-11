@@ -73,8 +73,6 @@ int main(int argc, char **argv) {
         for (long long i = 0; i < M; i++) {
             for (long long j = 0; j < N; j++) {
                 // center stays constant (the heat is still on)
-                // Loop tiling and vectorisation are options one has for maybe optimizing this
-                // program
                 if (i == source_y && j == source_x) {
                     B[i][j] = A[i][j];
                     continue;

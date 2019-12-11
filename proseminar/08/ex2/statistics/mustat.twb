@@ -73,7 +73,7 @@
       </column>
       <column caption='Walltime' datatype='real' name='[walltime]' role='measure' type='quantitative' />
       <column-instance column='[Calculation_580190357535850496]' derivation='None' name='[none:Calculation_580190357535850496:ok]' pivot='key' type='ordinal' />
-      <layout dim-ordering='alphabetic' dim-percentage='0.474407' measure-ordering='alphabetic' measure-percentage='0.525593' show-structure='true' />
+      <layout dim-ordering='alphabetic' dim-percentage='0.434457' measure-ordering='alphabetic' measure-percentage='0.565543' show-structure='true' />
       <style>
         <style-rule element='mark'>
           <encoding attr='color' field='[none:Calculation_580190357535850496:ok]' type='palette'>
@@ -132,12 +132,6 @@
             <column-instance column='[walltime]' derivation='None' name='[none:walltime:qk]' pivot='key' type='quantitative' />
             <column caption='Walltime' datatype='real' name='[walltime]' role='measure' type='quantitative' />
           </datasource-dependencies>
-          <filter class='categorical' column='[Flow1-node-Union 1-38248a0141b745cca4cffdbfa418c4da].[none:Calculation_580190357535850496:ok]'>
-            <groupfilter function='level-members' level='[none:Calculation_580190357535850496:ok]' user:ui-enumeration='all' user:ui-exclude='true' user:ui-marker='enumerate' />
-          </filter>
-          <slices>
-            <column>[Flow1-node-Union 1-38248a0141b745cca4cffdbfa418c4da].[none:Calculation_580190357535850496:ok]</column>
-          </slices>
           <aggregation value='true' />
         </view>
         <style>
@@ -156,8 +150,8 @@
             </encodings>
             <style>
               <style-rule element='mark'>
-                <format attr='mark-labels-cull' value='true' />
                 <format attr='mark-labels-show' value='true' />
+                <format attr='mark-labels-cull' value='true' />
               </style-rule>
             </style>
           </pane>
@@ -229,7 +223,7 @@
     </worksheet>
   </worksheets>
   <windows source-height='30'>
-    <window class='worksheet' name='Absolute Walltime in relation to Problem Size'>
+    <window class='worksheet' maximized='true' name='Absolute Walltime in relation to Problem Size'>
       <cards>
         <edge name='left'>
           <strip size='160'>
@@ -266,7 +260,7 @@
       </viewpoint>
       <simple-id uuid='{58D9C2CF-6C4B-4B08-98C7-D1F0BCA3B15A}' />
     </window>
-    <window class='worksheet' maximized='true' name='Relative Speedup in relation to Problem Size'>
+    <window class='worksheet' name='Relative Speedup in relation to Problem Size'>
       <cards>
         <edge name='left'>
           <strip size='160'>

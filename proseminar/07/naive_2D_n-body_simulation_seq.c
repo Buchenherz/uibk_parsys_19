@@ -1,8 +1,5 @@
 #include <math.h>
-
-// For work assignment (runtime system)
 #include <omp.h>
-
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -154,13 +151,8 @@ int main(int argc, char **argv) {
         // .. we propagate the positions
         double iteration_start_time = omp_get_wtime();
 
-        // If you dont have to, set the number of threads on the outside as an
-        // environment variable export OMP_NUM_THREADS=[num of threads to use]
         omp_set_num_threads(number_of_threads);
-        // Its not the best idea to create new threads for every iteration of
-        // time An idea could be to move the parallel above the first for loop
-        // and resuse the threads. Usually the compiler optimizes this nowadays
-        #pragma omp parallel for schedule(static, 1)
+#pragma omp parallel for schedule(static, 1)
         // https://software.intel.com/en-us/articles/openmp-loop-scheduling
         // http://ppc.cs.aalto.fi/ch3/schedule/
         for (int i = 0; i < particle_count; i++) {
@@ -329,7 +321,6 @@ void initParticles(particle *P, int particle_count, long long Nx, long long Ny,
 }
 
 void calculateParticleForces(particle *P, int i, int particle_count) {
-    // j++ could be a race condition if j is not private
     for (int j = 0; j < particle_count; j++) {
         if (i == j) {
             continue;
