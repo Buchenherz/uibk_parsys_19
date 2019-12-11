@@ -44,7 +44,7 @@ int main(int argc, char **argv)
 
   double start_time = omp_get_wtime();
   // ---------- setup ----------
-  srand(1234);   // Initialization, should only be called once.
+  srand(1234);   // Initialization, should only be called once. should have added
 
   // create matrixes
   Matrix A = createMatrix(N, M);
@@ -55,7 +55,7 @@ int main(int argc, char **argv)
   B = randomlyFillMatrix(B, M, L, print);
 
   // ---------- compute ----------
-  #pragma omp parallel for schedule(static,10) shared(C) firstprivate(A,B)
+  #pragma omp parallel for schedule(static,1) shared(C) firstprivate(A,B) // collapse(3) 
   for (int i = 0; i < N; i++) {
     for (int j = 0; j < L; j++) {
       for (int k = 0; k < M; k++) {
