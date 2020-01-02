@@ -11,6 +11,12 @@ The goal of this assignment is to write a hybrid MPI/OpenMP application.
 - Benchmark your problem for several problem sizes, numbers of threads and numbers of nodes. Include experiments with all nodes/cores. What can you observe?
 - For at least one larger problem size / number of threads / number of nodes combination, benchmark and compare all four cases of a) no optimization b) MPI optimization only c) OpenMP optimization only d) both. What can you observe?
 
+### Used files
+* `hs2d_mpi_no` is the non-optimized MPI version
+* `hs2d_mpi_o` is the optimized MPI version
+* `hs2d_omp_o` is the optimized OpenMP version
+* `hs2d_mpi_omp` is the version using both MPI and OpenMP
+
 ## General Notes
 
 All the material required by the tasks above (e.g. code, figures, etc...) must be part of the solution that is handed in. Your experiments should be reproducible and comparable to your own measurements using the solution materials that you hand in. For source code, please provide a makefile or other, intuitive means of compiling with the required flags and settings.
