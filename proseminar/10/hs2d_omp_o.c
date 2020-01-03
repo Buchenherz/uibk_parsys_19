@@ -44,6 +44,7 @@ int main(int argc, char **argv) {
     Matrix A = createMatrix(N, M);
 
     // set up initial conditions in A
+    #pragma omp parallel for
     for (int i = 0; i < M; i++) {
         for (int j = 0; j < N; j++) {
             A[i][j] = 273;  // temperature is 0° C everywhere (273 K)
@@ -68,9 +69,11 @@ int main(int argc, char **argv) {
 
     // for each time step ..
     for (int t = 0; t < T; t++) {
-        // .. we propagate the temperature
-#pragma omp parallel for
+    // .. we propagate the temperature
+    // Useful resource: https://software.intel.com/en-us/videos/performance-essentials-using-openmp-40-vectorization
+    #pragma omp parallel for simd collapse(2)
         for (long long i = 0; i < M; i++) {
+            //#pragma omp simd
             for (long long j = 0; j < N; j++) {
                 // center stays constant (the heat is still on)
                 if (i == source_y && j == source_x) {
