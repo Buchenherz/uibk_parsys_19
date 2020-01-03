@@ -294,7 +294,7 @@ int main(int argc, char **argv) {
         }
         // sleep(1);
         for (int orank = 1; orank < number_of_ranks; orank++) {
-            printf("\n");
+            
             value_t recv[M][N];
             // printf("\nRecv array %d\n", orank);
             MPI_Recv(&recv, 1, subarrayType, orank, 1, MPI_COMM_WORLD,
@@ -352,12 +352,17 @@ int main(int argc, char **argv) {
     }
 
     // ---------- cleanup ----------
-
-    releaseMatrix(A, M);
-    releaseMatrix(B, M);
+    
+    free(A);
+    
+    free(B);
+    
     free(rank_row_sizes);
+    
     MPI_Type_free(&row);
+    
     MPI_Type_free(&subarrayType);
+    
     MPI_Finalize();  // cleanup
 
     // done
@@ -376,8 +381,7 @@ Matrix createMatrix(int N, int M) {
 void releaseMatrix(Matrix m, int M) { free(m); }
 
 int *getRowSizePerRank(int M, int number_of_ranks) {
-    int *rows_per_rank;
-    rows_per_rank = (int *)malloc(number_of_ranks * sizeof(int));
+    int *rows_per_rank = malloc(number_of_ranks * sizeof(int));
 
     for (int loop = number_of_ranks; loop >= 0; loop--) {
         rows_per_rank[loop] = 0;
