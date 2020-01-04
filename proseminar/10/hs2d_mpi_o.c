@@ -171,14 +171,14 @@ int main(int argc, char **argv) {
             MPI_Request request;
             /* Upper rank does not exist, only receive one from below and send
              * one to below */
-            MPI_Sendrecv(A[local_last_row_index], 1, row, lower_rank, 0,
-                         received_lower_row, 1, row, lower_rank, 0, comm_cart,
-                         MPI_STATUS_IGNORE);
-            // MPI_Isend(A[local_last_row_index], 1, row, lower_rank, 0,
-            // comm_cart,
-            //           &request);
-            // MPI_Recv(received_lower_row, 1, row, lower_rank, 0, comm_cart,
-            //          MPI_STATUS_IGNORE);
+            // MPI_Sendrecv(A[local_last_row_index], 1, row, lower_rank, 0,
+            //              received_lower_row, 1, row, lower_rank, 0, comm_cart,
+            //              MPI_STATUS_IGNORE);
+            MPI_Isend(A[local_last_row_index], 1, row, lower_rank, 0,
+            comm_cart,
+                      &request);
+            MPI_Recv(received_lower_row, 1, row, lower_rank, 0, comm_cart,
+                     MPI_STATUS_IGNORE);
 
             /* Received the last local row from the lower rank, appending it as
              * the new last local row */
@@ -187,13 +187,13 @@ int main(int argc, char **argv) {
             MPI_Request request;
             /* Lower rank does not exist, only receive one from above and send
              * one to above */
-            MPI_Sendrecv(A[local_first_row_index], 1, row, upper_rank, 0,
-                         received_upper_row, 1, row, upper_rank, 0, comm_cart,
-                         MPI_STATUS_IGNORE);
-            // MPI_Recv(received_upper_row, 1, row, upper_rank, 0, comm_cart,
-            //          MPI_STATUS_IGNORE);
-            // MPI_Isend(A[local_first_row_index], 1, row, upper_rank, 0,
-            //           comm_cart, &request);
+            // MPI_Sendrecv(A[local_first_row_index], 1, row, upper_rank, 0,
+            //              received_upper_row, 1, row, upper_rank, 0, comm_cart,
+            //              MPI_STATUS_IGNORE);
+            MPI_Recv(received_upper_row, 1, row, upper_rank, 0, comm_cart,
+                     MPI_STATUS_IGNORE);
+            MPI_Isend(A[local_first_row_index], 1, row, upper_rank, 0,
+                      comm_cart, &request);
 
             /* Received the first local row from the upper rank, appending it as
              * the new last local row */
@@ -201,16 +201,16 @@ int main(int argc, char **argv) {
         } else {
             MPI_Request request;
             /* Upper and lower ranks exist, send and receive both */
-            MPI_Sendrecv(A[local_first_row_index], 1, row, upper_rank, 0, received_upper_row, 1, row, upper_rank, 0, comm_cart, MPI_STATUS_IGNORE);
-            MPI_Sendrecv(A[local_last_row_index], 1, row, lower_rank, 0, received_lower_row, 1, row, lower_rank, 0, comm_cart, MPI_STATUS_IGNORE);
-            // MPI_Isend(A[local_first_row_index], 1, row, upper_rank, 0,
-            //           comm_cart, &request);
-            // MPI_Isend(A[local_last_row_index], 1, row, lower_rank, 0, comm_cart,
-            //           &request);
-            // MPI_Recv(received_upper_row, 1, row, upper_rank, 0, comm_cart,
-            //          MPI_STATUS_IGNORE);
-            // MPI_Recv(received_lower_row, 1, row, lower_rank, 0, comm_cart,
-            //          MPI_STATUS_IGNORE);
+            // MPI_Sendrecv(A[local_first_row_index], 1, row, upper_rank, 0, received_upper_row, 1, row, upper_rank, 0, comm_cart, MPI_STATUS_IGNORE);
+            // MPI_Sendrecv(A[local_last_row_index], 1, row, lower_rank, 0, received_lower_row, 1, row, lower_rank, 0, comm_cart, MPI_STATUS_IGNORE);
+            MPI_Isend(A[local_first_row_index], 1, row, upper_rank, 0,
+                      comm_cart, &request);
+            MPI_Isend(A[local_last_row_index], 1, row, lower_rank, 0, comm_cart,
+                      &request);
+            MPI_Recv(received_upper_row, 1, row, upper_rank, 0, comm_cart,
+                     MPI_STATUS_IGNORE);
+            MPI_Recv(received_lower_row, 1, row, lower_rank, 0, comm_cart,
+                     MPI_STATUS_IGNORE);
             A[local_first_row_index - 1] = received_upper_row;
             A[local_last_row_index + 1] = received_lower_row;
         }
