@@ -1,10 +1,13 @@
+names = ["no","mpi","omp","both"]
 for i in range(1, 9):
-    job_name = "naive-nqueens-omp"
-    output_filename = job_name + f"{i}threads.out"
-    howmany_perwhathost = f"openmp {i}"
-    what2make = "omp"
+    for j in range(1, 5):
+        for k in range(0,4):
+            job_name = "hs2d_hybrid_" + names[k]
+            output_filename = job_name + f"{names[k]}_{i}threads_{j}ranks.out"
+            howmany_perwhathost = f"openmp {i} openmpi-{j}perhost {j}"
+            what2make = names[k]
 
-    out_txt = f"""#!/bin/bash
+            out_txt = f"""#!/bin/bash
 
 # Select queue.
 #$ -q std.q
@@ -13,7 +16,7 @@ for i in range(1, 9):
 #$ -cwd
 
 # Name the job
-#$ -N {job_name}{i}
+#$ -N {job_name}{i}{j}
 
 # Redirect output stream to this file. Useful for debugging, simple output, etc.
 #$ -o {output_filename}
@@ -38,9 +41,9 @@ module load gcc
 make {what2make}
 export OMP_NUM_THREADS={i}
 
-for ((i=1;i<=20;i++)); do
-	./{job_name} "$i"
+for ((i=100;i<=500;i+=100)); do
+	mpiexec -n {j} ./{job_name} "$i" "$i"
 done
 	"""
-    with open(f"{job_name}_{i}threads.script", "w") as outfile:
-        outfile.write(out_txt)
+            with open(f"{job_name}_{i}threads_{j}ranks.script", "w") as outfile:
+                outfile.write(out_txt)
