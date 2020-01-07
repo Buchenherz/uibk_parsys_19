@@ -190,10 +190,10 @@ int main(int argc, char **argv) {
             // MPI_Sendrecv(A[local_first_row_index], 1, row, upper_rank, 0,
             //              received_upper_row, 1, row, upper_rank, 0, comm_cart,
             //              MPI_STATUS_IGNORE);
-            MPI_Recv(received_upper_row, 1, row, upper_rank, 0, comm_cart,
-                     MPI_STATUS_IGNORE);
             MPI_Isend(A[local_first_row_index], 1, row, upper_rank, 0,
                       comm_cart, &request);
+            MPI_Recv(received_upper_row, 1, row, upper_rank, 0, comm_cart,
+                     MPI_STATUS_IGNORE);
 
             /* Received the first local row from the upper rank, appending it as
              * the new last local row */

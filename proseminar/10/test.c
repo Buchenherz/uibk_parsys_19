@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <omp.h>
 #include <mpi.h>
 #include <unistd.h>
 #include <time.h>
@@ -197,6 +198,8 @@ int main(int argc, char **argv)
     }
 
     // .. we propagate the temperature
+    
+    #pragma omp parallel for schedule(static)
     for (long long i = local_m_start; i < local_m_end; i++)
     {
 

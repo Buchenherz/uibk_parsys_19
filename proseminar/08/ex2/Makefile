@@ -22,6 +22,6 @@ clean:
 .PHONEY: run
 run: all
 	@echo "Sequential:"
-	@./matrix_mul_seq
+	@./matrix_mul_seq 100 10000 1000
 	@echo "OMP:"
-	@./matrix_mul_omp
+	@./matrix_mul_omp 100 10000 1000

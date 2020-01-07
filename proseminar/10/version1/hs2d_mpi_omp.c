@@ -191,10 +191,10 @@ int main(int argc, char **argv) {
             // MPI_Sendrecv(A[local_first_row_index], 1, row, upper_rank, 0,
             //              received_upper_row, 1, row, upper_rank, 0,
             //              comm_cart, MPI_STATUS_IGNORE);
-            MPI_Recv(received_upper_row, 1, row, upper_rank, 0, comm_cart,
-                     MPI_STATUS_IGNORE);
             MPI_Isend(A[local_first_row_index], 1, row, upper_rank, 0,
                       comm_cart, &request);
+            MPI_Recv(received_upper_row, 1, row, upper_rank, 0, comm_cart,
+                     MPI_STATUS_IGNORE);
 
             /* Received the first local row from the upper rank, appending it as
              * the new last local row */
@@ -220,7 +220,7 @@ int main(int argc, char **argv) {
         }
 
         // .. we propagate the temperature
-        #pragma omp parallel for simd collapse(2)
+        #pragma omp parallel for simd aligned(A;B:32) collapse(2)
         for (long long i = local_m_start; i < local_m_end; i++) {
             for (long long j = 0; j < N; j++) {
                 // center stays constant (the heat is still on)
@@ -352,7 +352,7 @@ int main(int argc, char **argv) {
             }
         }
 #ifdef VERBOSE
-        printf("Naïve Verification: %s\n", (success) ? "OK" : "FAILED");
+        printf("Naive Verification: %s\n", (success) ? "OK" : "FAILED");
 #endif
         releaseMatrix(comb, M);
         time = clock() - time;
@@ -383,9 +383,9 @@ int main(int argc, char **argv) {
 
 Matrix createMatrix(int N, int M) {
     // create data and index Matrix
-    value_t **mat = (value_t **)malloc(sizeof(value_t *) * M);
+    value_t **mat = (value_t **)aligned_alloc(32, sizeof(value_t *) * M);
     for (int i = 0; i < M; i++) {
-        mat[i] = (value_t *)malloc(sizeof(value_t) * N);
+        mat[i] = (value_t *)aligned_alloc(32, sizeof(value_t) * N);
     }
     return mat;
 }
