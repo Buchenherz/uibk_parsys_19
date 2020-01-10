@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <omp.h>
 
 #include "globals.h"
 #include "randdp.h"
@@ -52,6 +53,7 @@ double starts[NM];
 
 int main()
 {
+  double start_time = omp_get_wtime();
   //-------------------------------------------------------------------------c
   // k is the current level. It is passed down through subroutine args
   // and is NOT global. it is the current iteration
@@ -274,6 +276,7 @@ int main()
       printf(" VERIFICATION SUCCESSFUL\n");
       printf(" L2 Norm is %20.13E\n", rnm2);
       printf(" Error is   %20.13E\n", err);
+      printf(" Time is    %f seconds\n ", omp_get_wtime() - start_time);
     } else {
       verified = false;
       printf(" VERIFICATION FAILED\n");
