@@ -30,7 +30,15 @@ After decompressing the tar.gz file, we build the project using the delivered Ma
  | 21                    |  0.6%                            |  99.0%       |  21                 |  0.6%        |  comm3          | 
  | 19                    |  0.6%                            |  99.5%       |  166                |  4.9%        |  zran3          | 
  
- This clearly demonstrates that most of the execution time is spend in both `resid` and `psinv`, so that is where are parallelization focus needs to be.
+ This clearly demonstrates that most of the execution time is spend in both `resid` and `psinv`, so that is where are parallelization focus needs to be. A graphical representation (svg-format) can be found in the file [pprof-seq-non-optimised.svg](versions/pprof-seq-non-optimised.svg). 
+
+ ### Makefile
+ To be able to use gperf or perf, various flags have to be set in gcc (9.2.0_3). Notably, the `-g` and `-pg` flags for debug symbols and gprof support respectively. It is also recommended to use `-O0` for such measurements. To use `google-perftools`, we have to link `-lprofiler` and run the program with the environment variable `CPUPROFILE=<profile.name> ./program`. After execution has finished, one has to run google `pprof ./program <profile.name>`. 
+ For compiler optimisation, we added the `-march=native`, `-mtune=native`, `-ftree-vectorize`, and `-O3` flags. For OpenMP support, we also link `-fopenmp`.
+ 
+ ### Basic OMP parallelising
+ After locating the previously mentioned hotspots of `real.c`, we added simple OMP `for` pragmas which resulted in a dramatic runtime improvement.
+ 
 
 
 ## General Notes
