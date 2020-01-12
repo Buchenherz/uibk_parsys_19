@@ -1,36 +1,35 @@
 
-#include <stdio.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include <math.h>
 #include <omp.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 #include "globals.h"
+#include "print_results.h"
 #include "randdp.h"
 #include "timers.h"
-#include "print_results.h"
 
+#define DEBUG
 
 static void setup(int *n1, int *n2, int *n3);
 
-static void mg3P(double u[], double v[], double r[],
-                 double a[4], double c[4], int n1, int n2, int n3);
+static void mg3P(double u[], double v[], double r[], double a[4], double c[4],
+                 int n1, int n2, int n3);
 
-static void psinv(void *or, void *ou, int n1, int n2, int n3,
-                  double c[4], int k);
+static void psinv(void *or, void *ou, int n1, int n2, int n3, double c[4],
+                  int k);
 
 static void resid(void *ou, void *ov, void *or, int n1, int n2, int n3,
                   double a[4], int k);
 
-static void rprj3(void *or, int m1k, int m2k, int m3k,
-                  void *os, int m1j, int m2j, int m3j, int k);
+static void rprj3(void *or, int m1k, int m2k, int m3k, void *os, int m1j,
+                  int m2j, int m3j, int k);
 
-static void interp(void *oz, int mm1, int mm2, int mm3,
-                   void *ou, int n1, int n2, int n3, int k);
+static void interp(void *oz, int mm1, int mm2, int mm3, void *ou, int n1,
+                   int n2, int n3, int k);
 
-static void norm2u3(void *or, int n1, int n2, int n3,
-                    double *rnm2, double *rnmu,
-                    int nx, int ny, int nz);
+static void norm2u3(void *or, int n1, int n2, int n3, double *rnm2,
+                    double *rnmu, int nx, int ny, int nz);
 
 static void rep_nrm(void *u, int n1, int n2, int n3, char *title, int kk);
 
@@ -208,6 +207,15 @@ int main(int argc, const char *argv[]) {
 
     printf(" Size: %4dx%4dx%4d  (class %c)\n", nx[lt], ny[lt], nz[lt], Class);
     printf(" Iterations:                  %5d\n", nit);
+#ifdef DEBUG
+#pragma omp parallel
+    {
+#pragma omp single
+    {
+        printf(" Number of Threads:           %d\n", omp_get_num_threads());
+    }
+    }
+#endif
     printf("\n");
 
     resid(u, v, r, n1, n2, n3, a, k);
@@ -458,31 +466,33 @@ static void mg3P(double u[], double v[], double r[],
 // Note that this vectorizes, and is also fine for cache
 // based machines.
 //---------------------------------------------------------------------
-static void psinv(void *or, void *ou, int n1, int n2, int n3,
-                  double c[4], int k) {
-    double (*r)[n2][n1] = (double (*)[n2][n1]) or;
-    double (*u)[n2][n1] = (double (*)[n2][n1]) ou;
+static void psinv(void *or, void *ou, int n1, int n2, int n3, double c[4],
+                  int k) {
+    double(*r)[n2][n1] = (double (*)[n2][n1]) or;
+    double(*u)[n2][n1] = (double (*)[n2][n1]) ou;
 
+    // Putting this parallel up to here to local cache the following integers and double arrays
+#pragma omp parallel
+    {
     int i3, i2, i1;
-
     double r1[M], r2[M];
 
     if (timeron) timer_start(T_psinv);
-    // #pragma omp simd
+        #pragma omp for collapse(2)
     for (i3 = 1; i3 < n3 - 1; i3++) {
         for (i2 = 1; i2 < n2 - 1; i2++) {
             for (i1 = 0; i1 < n1; i1++) {
-                r1[i1] = r[i3][i2 - 1][i1] + r[i3][i2 + 1][i1]
-                         + r[i3 - 1][i2][i1] + r[i3 + 1][i2][i1];
-                r2[i1] = r[i3 - 1][i2 - 1][i1] + r[i3 - 1][i2 + 1][i1]
-                         + r[i3 + 1][i2 - 1][i1] + r[i3 + 1][i2 + 1][i1];
+                    r1[i1] = r[i3][i2 - 1][i1] + r[i3][i2 + 1][i1] +
+                             r[i3 - 1][i2][i1] + r[i3 + 1][i2][i1];
+                    r2[i1] = r[i3 - 1][i2 - 1][i1] + r[i3 - 1][i2 + 1][i1] +
+                             r[i3 + 1][i2 - 1][i1] + r[i3 + 1][i2 + 1][i1];
             }
+
             for (i1 = 1; i1 < n1 - 1; i1++) {
-                u[i3][i2][i1] = u[i3][i2][i1]
-                                + c[0] * r[i3][i2][i1]
-                                + c[1] * (r[i3][i2][i1 - 1] + r[i3][i2][i1 + 1]
-                                          + r1[i1])
-                                + c[2] * (r2[i1] + r1[i1 - 1] + r1[i1 + 1]);
+                    u[i3][i2][i1] =
+                            u[i3][i2][i1] + c[0] * r[i3][i2][i1] +
+                            c[1] * (r[i3][i2][i1 - 1] + r[i3][i2][i1 + 1] + r1[i1]) +
+                            c[2] * (r2[i1] + r1[i1 - 1] + r1[i1 + 1]);
                 //--------------------------------------------------------------------
                 // Assume c[3] = 0    (Enable line below if c[3] not= 0)
                 //--------------------------------------------------------------------
@@ -522,36 +532,46 @@ static void psinv(void *or, void *ou, int n1, int n2, int n3,
 //---------------------------------------------------------------------
 static void resid(void *ou, void *ov, void *or, int n1, int n2, int n3,
                   double a[4], int k) {
-    double (*u)[n2][n1] = (double (*)[n2][n1]) ou;
-    double (*v)[n2][n1] = (double (*)[n2][n1]) ov;
-    double (*r)[n2][n1] = (double (*)[n2][n1]) or;
 
+    double(*u)[n2][n1] = (double (*)[n2][n1]) ou;
+    double(*v)[n2][n1] = (double (*)[n2][n1]) ov;
+    double(*r)[n2][n1] = (double (*)[n2][n1]) or;
+
+#pragma omp parallel
+    {
     int i3, i2, i1;
     double u1[M], u2[M];
 
     if (timeron) timer_start(T_resid);
+
+#pragma omp for collapse(2)
     for (i3 = 1; i3 < n3 - 1; i3++) {
         for (i2 = 1; i2 < n2 - 1; i2++) {
             for (i1 = 0; i1 < n1; i1++) {
-                u1[i1] = u[i3][i2 - 1][i1] + u[i3][i2 + 1][i1]
-                         + u[i3 - 1][i2][i1] + u[i3 + 1][i2][i1];
-                u2[i1] = u[i3 - 1][i2 - 1][i1] + u[i3 - 1][i2 + 1][i1]
-                         + u[i3 + 1][i2 - 1][i1] + u[i3 + 1][i2 + 1][i1];
+                    u1[i1] = u[i3][i2 - 1][i1] + u[i3][i2 + 1][i1] +
+                             u[i3 - 1][i2][i1] + u[i3 + 1][i2][i1];
+                    u2[i1] = u[i3 - 1][i2 - 1][i1] + u[i3 - 1][i2 + 1][i1] +
+                             u[i3 + 1][i2 - 1][i1] + u[i3 + 1][i2 + 1][i1];
             }
             for (i1 = 1; i1 < n1 - 1; i1++) {
-                r[i3][i2][i1] = v[i3][i2][i1]
-                                - a[0] * u[i3][i2][i1]
+                    r[i3][i2][i1] =
+                            v[i3][i2][i1] -
+                            a[0] * u[i3][i2][i1]
                                 //-------------------------------------------------------------------
-                                //  Assume a[1] = 0      (Enable 2 lines below if a[1] not= 0)
+                            //  Assume a[1] = 0      (Enable 2 lines below if a[1]
+                            //  not= 0)
                                 //-------------------------------------------------------------------
-                                //            - a[1] * ( u[i3][i2][i1-1] + u[i3][i2][i1+1]
+                            //            - a[1] * ( u[i3][i2][i1-1] +
+                            //            u[i3][i2][i1+1]
                                 //                     + u1[i1] )
                                 //-------------------------------------------------------------------
-                                - a[2] * (u2[i1] + u1[i1 - 1] + u1[i1 + 1])
-                                - a[3] * (u2[i1 - 1] + u2[i1 + 1]);
+                            - a[2] * (u2[i1] + u1[i1 - 1] + u1[i1 + 1]) -
+                            a[3] * (u2[i1 - 1] + u2[i1 + 1]);
             }
         }
     }
+    }
+
     if (timeron) timer_stop(T_resid);
 
     //---------------------------------------------------------------------
