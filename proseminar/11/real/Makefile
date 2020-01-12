@@ -1,4 +1,5 @@
 CC=gcc
+CC_MAC=gcc-9
 CC_FLAGS_OPTIMIZED= -g -O3 -march=native -mtune=native -ftree-vectorize -lm -fopenmp
 CC_FLAGS_NON_OPTIMIZED= -O3 -g -lm -fopenmp
 CC_FLAGS_PROFILING_CLION= -fno-omit-frame-pointer -g -O0  -march=native -mtune=native -ftree-vectorize -lm -fopenmp
@@ -18,6 +19,8 @@ real-non-optimized-seq: $(SRC)
 real-optimized-seq-clion: $(SRC)
 	@$(CC) $(CC_FLAGS_OPTIMIZED) -o real $(SRC)
 
+mac: $(SRC)
+	@$(CC_MAC) $(CC_FLAGS_OPTIMIZED) -o real $(SRC)
 
 .PHONEY: clean
 clean:
