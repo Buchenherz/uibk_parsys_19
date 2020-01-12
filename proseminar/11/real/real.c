@@ -478,7 +478,7 @@ static void psinv(void *or, void *ou, int n1, int n2, int n3, double c[4],
     double r1[M], r2[M];
 
     if (timeron) timer_start(T_psinv);
-        #pragma omp for collapse(2)
+#pragma omp for collapse(2)
     for (i3 = 1; i3 < n3 - 1; i3++) {
         for (i2 = 1; i2 < n2 - 1; i2++) {
             for (i1 = 0; i1 < n1; i1++) {
@@ -500,6 +500,7 @@ static void psinv(void *or, void *ou, int n1, int n2, int n3, double c[4],
                 //--------------------------------------------------------------------
             }
         }
+    }
     }
     if (timeron) timer_stop(T_psinv);
 
