@@ -16,6 +16,7 @@ The file [real.tar.gz](real.tar.gz) contains a realistic implementation of a (si
 
 ## Task 1 
 After decompressing the tar.gz file, we build the project using the delivered Makefile. Our first step was to analyse hotspots using the `google-perftools` profiler (since neither gprof nor prof are available for macOS (it just works)). We followed the steps taught in the lecture to gather the following results: 
+ 
  | No. profiling samples |  % profiling samples in function |  % profiling samples in functions printed so far |  No. profiling samples in this function and its callees |  % profiling samples in function and its callees |  Function name  | 
  |-----------------------|----------------------------------|--------------|---------------------|--------------|-----------------| 
  | 1662                  |  49.2%                           |  49.2%       |  1675               |  49.6%       |  resid          | 
