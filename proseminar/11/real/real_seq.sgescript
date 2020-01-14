@@ -1,0 +1,35 @@
+#!/bin/bash
+
+# Select queue.
+#$ -q std.q
+
+# Use the current wd
+#$ -cwd
+
+# Name the job
+#$ -N real_optimized_seq
+
+# Redirect output stream to this file. Useful for debugging, simple output, etc.
+#$ -o real_optimized_seq_measure.out
+
+# Redirect error stream to this file.
+#$ -e error.dat
+
+# Join the error stream to the output stream.
+#$ -j yes
+
+#$ -l exclusive=true
+
+# Load module because the software can be run on another system and not in the current
+# ssh session
+# load module
+
+module load gcc
+make seq
+
+./real_seq
+./real_seq
+./real_seq
+./real_seq
+./real_seq
+	
