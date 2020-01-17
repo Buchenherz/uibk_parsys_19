@@ -43,5 +43,5 @@ debug: monte
 .PHONEY: 8thread
 8thread: monte
 	@export CHPL_RT_NUM_THREADS_PER_LOCALE=8
-	@./monte_pi --num_tasks=8 --debug=true
+	@./monte_pi --num_tasks=8
 	@CHPL_RT_NUM_THREADS_PER_LOCALE=8
