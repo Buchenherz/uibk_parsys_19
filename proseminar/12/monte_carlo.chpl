@@ -1,18 +1,32 @@
 use Random;
+use Time;
 
-config const number_of_points : int = 10000000;
-config const num_tasks: int = 4;
+// 10^9 number of points
+config const number_of_points : uint = 1000000000;
+// number of tasks / threads that are started
+config const num_tasks: uint = 4;
+// debug mode that enables some useful print statements
 config const debug: bool = false;
 
 proc main {
+    var timer: Timer;
+    timer.start();
+    
+    // Total hits, local hits will be reduced to this
+    var total_hits: atomic uint;
+    // Chapels version of initialising randomness, setting parSafe to false to 
+    // avoid locking overhead.
+    var rs = new RandomStream(eltType = real, parSafe = false);
 
-    var total_hits: atomic int;
-    var rs = new RandomStream(eltType = real, parSafe = true);
+    // coforall starts a new task each iteration 
+    // coforall loops, the execution of the
+    // parent task will not continue until all the children sync up.
+    // for more info, visit https://chapel-lang.org/docs/users-guide/taskpar/coforall.html?highlight=coforall
     coforall taskID in 1..#num_tasks {
         if debug {
-            writeln("Hello from task ", taskID);
+            writeln("Starting task ", taskID);
         }
-        var local_hits: int = 0;
+        var local_hits: uint = 0;
         for i in 1..number_of_points/num_tasks {
             var random_x = rs.getNext(0,1);
             var random_y = rs.getNext(0,1);
@@ -23,8 +37,13 @@ proc main {
         if debug {
             writeln("Task ", taskID, " got ", local_hits, " local hits");
         }
+        // add local hits atomically to total hits
         total_hits.add(local_hits);
     }
     var pi:real  = (total_hits.read():real / number_of_points) * 4;
-    writeln("Pi: ", pi);
+    if debug {
+        writeln("\n---------------");
+        writeln("Pi, Time (s)");
+    }
+    writeln(pi, ", ", timer.elapsed());
 }

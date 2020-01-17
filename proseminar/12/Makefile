@@ -18,4 +18,4 @@ run: all
 	
 .PHONEY: debug
 debug: monte
-	@./monte_pi --debug=true
+	@./monte_pi --debug=true --number_of_points=10000000 -num_tasks=4
