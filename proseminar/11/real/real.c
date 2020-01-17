@@ -211,9 +211,9 @@ int main(int argc, const char *argv[]) {
 #pragma omp parallel
     {
 #pragma omp single
-    {
-        printf(" Number of Threads:           %d\n", omp_get_num_threads());
-    }
+        {
+            printf(" Number of Threads:           %d\n", omp_get_num_threads());
+        }
     }
 #endif
     printf("\n");
@@ -474,33 +474,33 @@ static void psinv(void *or, void *ou, int n1, int n2, int n3, double c[4],
     // Putting this parallel up to here to local cache the following integers and double arrays
 #pragma omp parallel
     {
-    int i3, i2, i1;
-    double r1[M], r2[M];
+        int i3, i2, i1;
+        double r1[M], r2[M];
 
-    if (timeron) timer_start(T_psinv);
+        if (timeron) timer_start(T_psinv);
 #pragma omp for collapse(2)
-    for (i3 = 1; i3 < n3 - 1; i3++) {
-        for (i2 = 1; i2 < n2 - 1; i2++) {
-            for (i1 = 0; i1 < n1; i1++) {
+        for (i3 = 1; i3 < n3 - 1; i3++) {
+            for (i2 = 1; i2 < n2 - 1; i2++) {
+                for (i1 = 0; i1 < n1; i1++) {
                     r1[i1] = r[i3][i2 - 1][i1] + r[i3][i2 + 1][i1] +
                              r[i3 - 1][i2][i1] + r[i3 + 1][i2][i1];
                     r2[i1] = r[i3 - 1][i2 - 1][i1] + r[i3 - 1][i2 + 1][i1] +
                              r[i3 + 1][i2 - 1][i1] + r[i3 + 1][i2 + 1][i1];
-            }
+                }
 
-            for (i1 = 1; i1 < n1 - 1; i1++) {
+                for (i1 = 1; i1 < n1 - 1; i1++) {
                     u[i3][i2][i1] =
                             u[i3][i2][i1] + c[0] * r[i3][i2][i1] +
                             c[1] * (r[i3][i2][i1 - 1] + r[i3][i2][i1 + 1] + r1[i1]) +
                             c[2] * (r2[i1] + r1[i1 - 1] + r1[i1 + 1]);
-                //--------------------------------------------------------------------
-                // Assume c[3] = 0    (Enable line below if c[3] not= 0)
-                //--------------------------------------------------------------------
-                //            + c[3] * ( r2[i1-1] + r2[i1+1] )
-                //--------------------------------------------------------------------
+                    //--------------------------------------------------------------------
+                    // Assume c[3] = 0    (Enable line below if c[3] not= 0)
+                    //--------------------------------------------------------------------
+                    //            + c[3] * ( r2[i1-1] + r2[i1+1] )
+                    //--------------------------------------------------------------------
+                }
             }
         }
-    }
     }
     if (timeron) timer_stop(T_psinv);
 
@@ -540,37 +540,37 @@ static void resid(void *ou, void *ov, void *or, int n1, int n2, int n3,
 
 #pragma omp parallel
     {
-    int i3, i2, i1;
-    double u1[M], u2[M];
+        int i3, i2, i1;
+        double u1[M], u2[M];
 
-    if (timeron) timer_start(T_resid);
+        if (timeron) timer_start(T_resid);
 
 #pragma omp for collapse(2)
-    for (i3 = 1; i3 < n3 - 1; i3++) {
-        for (i2 = 1; i2 < n2 - 1; i2++) {
-            for (i1 = 0; i1 < n1; i1++) {
+        for (i3 = 1; i3 < n3 - 1; i3++) {
+            for (i2 = 1; i2 < n2 - 1; i2++) {
+                for (i1 = 0; i1 < n1; i1++) {
                     u1[i1] = u[i3][i2 - 1][i1] + u[i3][i2 + 1][i1] +
                              u[i3 - 1][i2][i1] + u[i3 + 1][i2][i1];
                     u2[i1] = u[i3 - 1][i2 - 1][i1] + u[i3 - 1][i2 + 1][i1] +
                              u[i3 + 1][i2 - 1][i1] + u[i3 + 1][i2 + 1][i1];
-            }
-            for (i1 = 1; i1 < n1 - 1; i1++) {
+                }
+                for (i1 = 1; i1 < n1 - 1; i1++) {
                     r[i3][i2][i1] =
                             v[i3][i2][i1] -
                             a[0] * u[i3][i2][i1]
-                                //-------------------------------------------------------------------
+                            //-------------------------------------------------------------------
                             //  Assume a[1] = 0      (Enable 2 lines below if a[1]
                             //  not= 0)
-                                //-------------------------------------------------------------------
+                            //-------------------------------------------------------------------
                             //            - a[1] * ( u[i3][i2][i1-1] +
                             //            u[i3][i2][i1+1]
-                                //                     + u1[i1] )
-                                //-------------------------------------------------------------------
+                            //                     + u1[i1] )
+                            //-------------------------------------------------------------------
                             - a[2] * (u2[i1] + u1[i1 - 1] + u1[i1 + 1]) -
                             a[3] * (u2[i1 - 1] + u2[i1 + 1]);
+                }
             }
         }
-    }
     }
 
     if (timeron) timer_stop(T_resid);
@@ -603,7 +603,7 @@ static void rprj3(void *or, int m1k, int m2k, int m3k,
                   void *os, int m1j, int m2j, int m3j, int k) {
     double (*r)[m2k][m1k] = (double (*)[m2k][m1k]) or;
     double (*s)[m2j][m1j] = (double (*)[m2j][m1j]) os;
-
+    // This can be parallelised using omp parallel for
     int j3, j2, j1, i3, i2, i1, d1, d2, d3, j;
 
     double x1[M], y1[M], x2, y2;
@@ -631,7 +631,7 @@ static void rprj3(void *or, int m1k, int m2k, int m3k,
         i3 = 2 * j3 - d3;
         for (j2 = 1; j2 < m2j - 1; j2++) {
             i2 = 2 * j2 - d2;
-
+            // This can be simded with omp
             for (j1 = 1; j1 < m1j; j1++) {
                 i1 = 2 * j1 - d1;
                 x1[i1] = r[i3 + 1][i2][i1] + r[i3 + 1][i2 + 2][i1]
@@ -1227,8 +1227,9 @@ static void bubble(double ten[][2], int j1[][2], int j2[][2], int j3[][2],
 static void zero3(void *oz, int n1, int n2, int n3) {
     double (*z)[n2][n1] = (double (*)[n2][n1]) oz;
 
+    // this can be parallelised to get a lot of performance first touch does not only work with malloc but also with
+    // arrays
     int i1, i2, i3;
-
     for (i3 = 0; i3 < n3; i3++) {
         for (i2 = 0; i2 < n2; i2++) {
             for (i1 = 0; i1 < n1; i1++) {

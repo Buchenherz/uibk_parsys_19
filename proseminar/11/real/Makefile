@@ -1,9 +1,10 @@
 CC=gcc
 CC_MAC=gcc-9
-CC_FLAGS_OPTIMIZED= -g -O3 -march=native -mtune=native -ftree-vectorize -lm -fopenmp
-CC_FLAGS_NON_OPTIMIZED= -O0 -g -lm -fopenmp
-CC_FLAGS_PROFILING_CLION= -fno-omit-frame-pointer -g -O0 -march=native -mtune=native -ftree-vectorize -lm -fopenmp
-
+CC_FLAGS_OPTIMIZED= -g -O3 -Wall -Wextra -march=native -mtune=native -ftree-vectorize -lm -fopenmp
+CC_FLAGS_NON_OPTIMIZED= -O0 -Wall -Wextra -g -lm -fopenmp
+CC_FLAGS_PROFILING_CLION= -fno-omit-frame-pointer -g -O0 -Wall -Wextra -march=native -mtune=native -ftree-vectorize -lprofiler -lm -fopenmp
+# you could also use -ftree-vectorizer-verbose=1 or 2 to get verbose output of vectorization
+# 02 might give better performance
 .PHONEY: all
 all: real-optimized real-non-optimized seq
 clion: real-clion
