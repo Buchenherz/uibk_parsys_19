@@ -8,6 +8,9 @@ config const num_tasks: uint = 4;
 // debug mode that enables some useful print statements
 config const debug: bool = false;
 
+// To control the number of threads, set CHPL_RT_NUM_THREADS_PER_LOCALE=num_tasks
+// (https://chapel-lang.org/docs/usingchapel/tasks.html#controlling-the-number-of-threads)
+
 proc main {
     var timer: Timer;
     timer.start();
