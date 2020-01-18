@@ -27,18 +27,20 @@ proc main {
     // for more info, visit https://chapel-lang.org/docs/users-guide/taskpar/coforall.html?highlight=coforall
     coforall taskID in 1..#num_tasks {
         if debug {
-            writeln("Starting task ", taskID);
+            writeln("Starting task ", taskID, " at time ", timer.elapsed(), ". It will go through ", number_of_points/num_tasks, " entries.");
         }
         var local_hits: uint = 0;
+        var random_x: real;
+        var random_y: real;
         for i in 1..number_of_points/num_tasks {
-            var random_x = rs.getNext(0,1);
-            var random_y = rs.getNext(0,1);
+            random_x = rs.getNext(0,1);
+            random_y = rs.getNext(0,1);
             if (random_x ** 2 + random_y ** 2) < 1.0 {
                 local_hits+=1;
             }
         }
         if debug {
-            writeln("Task ", taskID, " got ", local_hits, " local hits");
+            writeln("Task ", taskID, " got ", local_hits, " local hits at time ", timer.elapsed());
         }
         // add local hits atomically to total hits
         total_hits.add(local_hits);

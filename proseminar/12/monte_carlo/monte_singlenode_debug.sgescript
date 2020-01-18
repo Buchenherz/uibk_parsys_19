@@ -7,10 +7,10 @@
 #$ -cwd
 
 # Name the job
-#$ -N monte_singlenode
+#$ -N monte_singlenode_debug
 
 # Redirect output stream to this file. Useful for debugging, simple output, etc.
-#$ -o monte_singlenode.out
+#$ -o monte_singlenode_debug.out
 
 # Redirect error stream to this file.
 #$ -e error.dat
@@ -20,7 +20,7 @@
 
 #$ -l exclusive=true
 
-#$ -pe openmp 8
+#$ -pe openmp 4
 
 # Load module because the software can be run on another system and not in the current
 # ssh session
@@ -29,6 +29,6 @@
 cd ../chapel/chapel-1.20.0/
 source util/quickstart/setchplenv.bash
 cd ../../12
-echo $(ls)
+
 
 make debug
