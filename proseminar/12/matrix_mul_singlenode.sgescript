@@ -1,0 +1,34 @@
+#!/bin/bash
+
+# Select queue.
+#$ -q std.q
+
+# Use the current wd
+#$ -cwd
+
+# Name the job
+#$ -N matrix_mul_singlenode
+
+# Redirect output stream to this file. Useful for debugging, simple output, etc.
+#$ -o matrix_mul_singlenode.out
+
+# Redirect error stream to this file.
+#$ -e error.dat
+
+# Join the error stream to the output stream.
+#$ -j yes
+
+#$ -l exclusive=true
+
+#$ -pe openmp 8
+
+# Load module because the software can be run on another system and not in the current
+# ssh session
+# load module
+
+cd ../chapel/chapel-1.20.0/
+source util/quickstart/setchplenv.bash
+cd ../../12
+echo $(ls)
+
+make debug
