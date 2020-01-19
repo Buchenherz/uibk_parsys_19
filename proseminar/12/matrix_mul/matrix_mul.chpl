@@ -15,9 +15,6 @@ proc main {
     var timer: Timer;
     timer.start();
     
-    // Total hits, local hits will be reduced to this
-    var total_hits: atomic uint;
-
     var matrixA = Matrix(#rows_and_columns);
     var matrixB = Matrix(#rows_and_columns);
     var matrixC = Matrix(#rows_and_columns);
@@ -26,6 +23,8 @@ proc main {
     fillRandom(matrixB, seed);
     if debug {
         writeln(matrixA);
+        writeln("\n---------------");
+        writeln(matrixB);
         writeln("\n---------------");
     }
 
