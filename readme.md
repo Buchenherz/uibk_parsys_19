@@ -4,8 +4,24 @@ This repository will provide lecture and lab material for the UIBK Parallel Syst
 
 ## Topics Include:
 
- - parallel programming concepts
- - distributed memory parallelization using MPI
- - performance-oriented programming
- - proper experiment orchestration and benchmarking
- - parallel programming tools
+- parallel programming concepts
+- distributed memory parallelization using MPI
+- performance-oriented programming
+- proper experiment orchestration and benchmarking
+- parallel programming tools
+
+## Specification
+
+SGE job files:
+`CamelCase.sge`
+
+C fiels
+`CamelCase.c`
+
+Binary files
+`CamelCase.cout`
+
+SGE Output files
+`jobname.out`
+
+

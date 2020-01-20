@@ -31,12 +31,9 @@ proc main() {
         writeln("Global variable numOfPoints is stored on ", numOfPoints.locale.id);
     }
 
+    // https://chapel-lang.org/docs/primers/locales.html#primers-locales
     for loc in Locales do
         on loc do {
-            if debug {
-                writeln("Locale ", here.id, " starting with ", numOfTasks, " available tasks!");
-                writeln("Locale ", here.id, " generating ", numOfPoints/numLocales, " points.");
-            }
 
             // domain over the number of random points to generate
             var D = {1..numOfPoints/numLocales};

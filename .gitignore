@@ -18,3 +18,32 @@ proseminar/05/2D_n-body_simulation_seq.dSYM/
 proseminar/05/2D_n-body_simulation_seq_scaled.dSYM/
 
 proseminar/chapel
+proseminar/11/real.trace
+proseminar/11/real/cmake-build-debug
+*.dSYM
+proseminar/11/real/CMakeLists.txt
+proseminar/11/real/real
+proseminar/11/real/real_seq
+proseminar/02/ex1/cmake-build-debug
+
+proseminar/07/omp course files
+
+proseminar/07/testing
+
+proseminar/09/lol.c
+proseminar/07/sge_openmpi_environment
+
+lecture/11_programming_models_v16-1-19.pdf
+/proseminar/12/monte_carlo/monte_singlenode.sgescript
+/proseminar/12/monte_carlo/monte_singlenode1.sgescript
+/proseminar/12/monte_carlo/monte_singlenode2.sgescript
+/proseminar/12/monte_carlo/monte_singlenode4.sgescript
+/proseminar/12/monte_carlo/monte_singlenode8.sgescript
+/proseminar/12/monte_carlo/monte
+/proseminar/12/monte_carlo/monte_multinode1.sgescript
+/proseminar/12/monte_carlo/monte_multinode2.sgescript
+/proseminar/12/monte_carlo/monte_multinode4.sgescript
+/proseminar/12/monte_carlo/monte_pi
+/proseminar/12/monte_carlo/monte_real
+/proseminar/12/monte_carlo/whatszip
+/proseminar/12/monte_carlo/whatszip.chpl
