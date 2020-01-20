@@ -26,9 +26,9 @@
 # ssh session
 # load module
 
-cd ../chapel/chapel-1.20.0/
+cd ../../chapel/chapel-1.20.0/
 source util/quickstart/setchplenv.bash
-cd ../../12
+cd ../../12/monte_carlo
 
 
 make debug
