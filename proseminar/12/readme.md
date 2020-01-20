@@ -15,6 +15,11 @@ The Chapel programming model has been briefly discussed in the lecture. It is a 
 - Implement a parallel version of matrix multiplication in Chapel and benchmark it for 1, 2, 4, and 8 threads on LCC2 with a problem size of 2552x2552.
 - Enter your results in [this table](https://docs.google.com/spreadsheets/d/1Xklv7YoOBet34Q82SfKXc7K_bv_6E43UlxSStN7RDuc/edit?usp=sharing).
 
+#### Monte Carlo
+
+The initial implementation can be found in the source file `monte_carlo.chpl` within the `monte_carlo` directory. For some reason, this implementation is very, very slow. Moreover, on LCC2, it got SLOWER the more threads we were using. The single-threaded version on LCC2 was 3 times faster than the 8-threaded version; very peculiar. I believe it has something to do with the Random.getnext() method that chapel provides (note that I disabled parSafe mode, to not wait in each thread).
+After seeing that some people got a much faster result in the spreadsheet, we decided to try out an example implementation found on github. This version is found in the file `fast_monte_carlo.chpl` (`make fast-monte`). This version uses reduction and `zip` as well as a different method of the Random class to generate the random variables. It is significantly faster than the first implementation. 
+
 ## Exercise 2
 
 ### Tasks
@@ -30,4 +35,4 @@ All the material required by the tasks above (e.g. code, figures, etc...) must b
 **Every** member of your group must be able to explain the given problem, your solution, and possible findings. You may also need to answer detailed questions about any of these aspects.
 
 **Please run any benchmarks or heavy CPU loads only on the compute nodes, not on the login node.**
-If you want to do some interactive experimentation, use an *interactive job* as outlined in the tutorial. Make sure to stop any interactive jobs once you are done.
+If you want to do some interactive experimentation, use an _interactive job_ as outlined in the tutorial. Make sure to stop any interactive jobs once you are done.
