@@ -1,10 +1,9 @@
 use Random;
 use Time;
+// use LinearAlgebra;
 
-// 10^9 number of points
-config const rows_and_columns : uint = 2552;
-// number of tasks / threads that are started
-config const num_tasks: uint = 4;
+// 2552 number of rows and columns
+config const rows_and_columns : int = 2552;
 // debug mode that enables some useful print statements
 config const debug: bool = false;
 
@@ -15,12 +14,15 @@ proc main {
     var timer: Timer;
     timer.start();
     
-    var matrixA = Matrix(#rows_and_columns);
-    var matrixB = Matrix(#rows_and_columns);
-    var matrixC = Matrix(#rows_and_columns);
-
-    fillRandom(matrixA, seed);
-    fillRandom(matrixB, seed);
+    var matrixA: [0..#rows_and_columns, 0..#rows_and_columns] real; // first matrix 
+    var matrixB: [0..#rows_and_columns, 0..#rows_and_columns] real; // second matrix
+    var matrixC: [0..#rows_and_columns, 0..#rows_and_columns] real; // matrix for results
+    // use different seeds otherwise matrixA equals matrixB
+    var seed1 = 13;
+    var seed2 = 103;
+    fillRandom(matrixA, seed1);
+    fillRandom(matrixB, seed2);
+    matrixC = 0.0;
     if debug {
         writeln(matrixA);
         writeln("\n---------------");
@@ -28,24 +30,12 @@ proc main {
         writeln("\n---------------");
     }
 
-    // coforall starts a new task each iteration 
-    // coforall loops, the execution of the
-    // parent task will not continue until all the children sync up.
-    // for more info, visit https://chapel-lang.org/docs/users-guide/taskpar/coforall.html?highlight=coforall
-    coforall taskID in 0..#num_tasks {
-        if debug {
-            writeln("Starting task ", taskID);
-        }
-        
-        for i in rows_and_columns/num_tasks*taskID..rows_and_columns/num_tasks*(taskID+1) {
-            for j in rows_and_columns/num_tasks*taskID..rows_and_columns/num_tasks*(taskID+1) {
-                for k in rows_and_columns/num_tasks*taskID..rows_and_columns/num_tasks*(taskID+1) {
-                    matrixC[i][j] += matrixA[i][k]*matrixB[k][j];
-                }
-            }
-        }
+    // computation
+    forall (i,j,k) in {0..rows_and_columns-1,0..rows_and_columns-1,0..rows_and_columns-1} {
+        matrixC(i,j) += matrixA(i,k)*matrixB(k,j);
     }
     if debug {
+        writeln("\n---------------");
         writeln(matrixC);
         writeln("\n---------------");
         writeln("Time (s)");

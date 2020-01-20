@@ -31,4 +31,7 @@ source util/quickstart/setchplenv.bash
 cd ../../12/matrix_mul
 echo $(ls)
 
-make debug
+make 1thread
+make 2thread
+make 4thread
+make 8thread
