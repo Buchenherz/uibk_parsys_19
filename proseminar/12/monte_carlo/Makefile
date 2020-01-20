@@ -5,8 +5,11 @@ binaries=monte_pi
 
 all: monte
 
-monte: $(SEQ_SRC)
-	@$(CC) $(SRC) -o monte_pi 
+monte: monte_carlo.chpl
+	@$(CC) $(SRC) -o monte_pi
+
+fast-monte: fast_monte_carlo.chpl
+	@$(CC) fast_monte_carlo.chpl -o monte_pi
 
 .PHONEY: clean
 clean:
@@ -35,3 +38,23 @@ debug: monte
 .PHONEY: 8thread
 8thread: monte
 	@CHPL_RT_NUM_THREADS_PER_LOCALE=8 ./monte_pi --num_tasks=8 --debug=true
+
+.PHONEY: fast-debug
+fast-debug: fast-monte
+	@CHPL_RT_NUM_THREADS_PER_LOCALE=4 ./monte_pi
+
+.PHONEY: fast-1thread
+fast-1thread: fast-monte
+	@CHPL_RT_NUM_THREADS_PER_LOCALE=1 ./monte_pi
+
+.PHONEY: fast-2thread
+fast-2thread: fast-monte
+	@CHPL_RT_NUM_THREADS_PER_LOCALE=2 ./monte_pi
+
+.PHONEY: fast-4thread
+fast-4thread: fast-monte
+	@CHPL_RT_NUM_THREADS_PER_LOCALE=4 ./monte_pi
+
+.PHONEY: fast-8thread
+fast-8thread: fast-monte
+	@CHPL_RT_NUM_THREADS_PER_LOCALE=8 ./monte_pi
