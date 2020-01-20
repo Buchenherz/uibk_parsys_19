@@ -2,9 +2,9 @@ use Random;
 use Time;
 
 // 10^9 number of points
-config const number_of_points : uint = 1000000000;
-// number of tasks / threads that are started
-config const num_tasks: uint = 4;
+config const number_of_points : int = 1000000000;
+// number of tasks / threads that are started (https://chapel-lang.org/docs/builtins/ChapelLocale.html?highlight=maxtaskpar#ChapelLocale.locale.maxTaskPar)
+config const num_tasks: int = here.maxTaskPar;
 // debug mode that enables some useful print statements
 config const debug: bool = false;
 
@@ -16,7 +16,7 @@ proc main {
     timer.start();
     
     // Total hits, local hits will be reduced to this
-    var total_hits: atomic uint;
+    var total_hits: atomic int;
     // Chapels version of initialising randomness, setting parSafe to false to 
     // avoid locking overhead.
     var rs = new RandomStream(eltType = real, parSafe = false);
@@ -25,11 +25,11 @@ proc main {
     // coforall loops, the execution of the
     // parent task will not continue until all the children sync up.
     // for more info, visit https://chapel-lang.org/docs/users-guide/taskpar/coforall.html?highlight=coforall
-    coforall taskID in 1..#num_tasks {
+    forall taskID in {1..num_tasks} {
         if debug {
             writeln("Starting task ", taskID, " at time ", timer.elapsed(), ". It will go through ", number_of_points/num_tasks, " entries.");
         }
-        var local_hits: uint = 0;
+        var local_hits: int = 0;
         var random_x: real;
         var random_y: real;
         for i in 1..number_of_points/num_tasks {
