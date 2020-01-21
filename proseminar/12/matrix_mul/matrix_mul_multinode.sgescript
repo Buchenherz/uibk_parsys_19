@@ -1,0 +1,39 @@
+#!/bin/bash
+
+# Select queue.
+#$ -q std.q
+
+# Use the current wd
+#$ -cwd
+
+# Name the job
+#$ -N matrix_mul_multinode
+
+# Redirect output stream to this file. Useful for debugging, simple output, etc.
+#$ -o matrix_mul_multinode.out
+
+# Redirect error stream to this file.
+#$ -e error.dat
+
+# Join the error stream to the output stream.
+#$ -j yes
+
+#$ -l exclusive=true
+
+#$ -pe openmpi-8perhost 32
+
+# Load module because the software can be run on another system and not in the current
+# ssh session
+# load module
+module load gcc
+module load openmpi/3.1.1
+
+cd ../../chapel/chapel-1.20.0/
+source util/quickstart/setchplenv.bash
+export CHPL_COMM=gasnet
+export CHPL_LAUNCHER=gasnetrun_mpi
+export CHPL_COMM_SUBSTRATE=mpi
+cd ../../12/matrix_mul
+
+chpl matrix_mul_multinode.chpl -o matrix_mul_multinode
+CHPL_RT_NUM_THREADS_PER_LOCALE=8 ./matrix_mul_multinode -nl 8
